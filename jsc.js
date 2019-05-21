@@ -120,7 +120,8 @@
     };
 
     _self.createPayloadToAddIssue = function(projectKey, issueKey, taskName) {
-      return '{"fields":{"project":{"key": "'+projectKey+'"},"parent":{"key": "'+issueKey+'"},"summary":"'+taskName+'","issuetype":{"id":"8"}}}';
+      return '{"fields":{"project":{"key": "'+projectKey+'"},"parent":{"key": "'
+        +issueKey+'"},"summary":"'+taskName+'","issuetype":{"id":"8"},"customfield_11200":{"id":"10504"}}}';
     };
 
     _self.setTasksToCreate = function(taskNames) {

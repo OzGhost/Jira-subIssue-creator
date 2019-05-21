@@ -5,6 +5,7 @@
     _self.ports = [];
     _self.taskNames = [];
     _self.countDown = 10;
+    _self.currentWrapper = {};
 
     _self.watch = function() {
       _self.ports = document.querySelectorAll('span[data-fieldname="sprintName"]');
@@ -41,6 +42,7 @@
         btn.addEventListener("click", function() {
           _self.fireOn(i);
           _self.nodeUnnail(i, btn);
+          _self.currentWrapper = _self.ports[i].parentNode.parentNode.parentNode.parentNode;
         });
         _self.nodeNail(i, btn);
       }
@@ -69,23 +71,51 @@
         let len = issues.length;
         for (let i = 0; i < len; i++) {
           let issue = issues[i];
-          _self.createTaskOn(issue.fields.project.key, issue.key);
+          _self.createTaskOn(issue.fields.project.key, issue.key, targetPortIndex);
         }
       });
     };
 
-    _self.createTaskOn = function(projectKey, issueKey) {
-      for (let i = 0; i < _self.taskNames.length; i++) {
-        fetch("https://jira.axonivy.com/jira/rest/api/2/issue/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: _self.createPayloadToAddIssue(projectKey, issueKey, _self.taskNames[i])
-        })
-        .then(function(rs){
-          // do nothing
-        });
+    _self.insertSuccessDot = function(container) {
+      let dot = document.createElement("i");
+      dot.className = "dot success";
+      container.appendChild(dot);
+    };
+
+    _self.insertFailureDot = function(container) {
+      let dot = document.createElement("i");
+      dot.className = "dot failure";
+      container.appendChild(dot);
+    };
+
+    _self.createTaskOn = function(projectKey, issueKey, targetPortIndex) {
+      let ik = 'a[href$="' + issueKey + '"]';
+      let oe = _self.currentWrapper
+              && _self.currentWrapper.querySelector;
+      if (oe) {
+        oe = _self.currentWrapper.querySelector(ik);
+      }
+      if (oe) {
+        for (let i = 0; i < _self.taskNames.length; i++) {
+          fetch("https://jira.axonivy.com/jira/rest/api/2/issue/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: _self.createPayloadToAddIssue(projectKey, issueKey, _self.taskNames[i])
+          })
+          .then(function(rs){
+            if (rs.ok) {
+              _self.insertSuccessDot(oe);
+            } else {
+              _self.insertFailureDot(oe);
+            }
+          })
+          .catch(function(error){
+            console.log(error);
+            _self.insertFailureDot(oe);
+          });
+        }
       }
     };
 

@@ -74,7 +74,7 @@
         let len = issues.length;
         for (let i = 0; i < len; i++) {
           let issue = issues[i];
-          _self.createTaskOn(issue.fields.project.key, issue.key, targetPortIndex);
+          _self.createTaskOn(issue.fields.project.key, issue.key);
         }
       });
     };
@@ -91,35 +91,84 @@
       container.appendChild(dot);
     };
 
-    _self.createTaskOn = function(projectKey, issueKey, targetPortIndex) {
+    _self.createTaskOn = function(projectKey, issueKey) {
       let ik = 'a[href$="' + issueKey + '"]';
-      let oe = _self.currentWrapper
+      let lightHook = _self.currentWrapper
               && _self.currentWrapper.querySelector;
-      if (oe) {
-        oe = _self.currentWrapper.querySelector(ik);
+      if (lightHook) {
+        lightHook = _self.currentWrapper.querySelector(ik);
       }
-      if (oe) {
-        for (let i = 0; i < _self.taskNames.length; i++) {
-          fetch("https://jira.axonivy.com/jira/rest/api/2/issue/", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: _self.createPayloadToAddIssue(projectKey, issueKey, _self.taskNames[i])
-          })
-          .then(function(rs){
-            if (rs.ok) {
-              _self.insertSuccessDot(oe);
-            } else {
-              _self.insertFailureDot(oe);
-            }
-          })
-          .catch(function(error){
-            console.log(error);
-            _self.insertFailureDot(oe);
-          });
+      if (lightHook) {
+        fetch("https://jira.axonivy.com/jira/rest/api/2/issue/"+issueKey+"/subtask")
+        .then(function(rs){
+          return rs.json();
+        })
+        .then(function(body) {
+          let currentSubtaskNames = _self.extractSubtaskNames(body);
+          let missingSubtaskNames = _self.collectMissingSubtaskNames(currentSubtaskNames);
+          let len = missingSubtaskNames.length;
+          for (let i = 0; i < len; i++) {
+            _self.shift(projectKey, issueKey, missingSubtaskNames[i], lightHook);
+            //console.log("simulate: create task "+missingSubtaskNames[i]+" on project "+projectKey+" with issue key "+issueKey);
+          }
+        })
+        .catch(function(error){
+          console.error(error);
+          _self.insertFailureDot(lightHook);
+        });
+      }
+    };
+
+    _self.extractSubtaskNames = function(response) {
+      let subtaskNames = [];
+      for (let i = 0; i < response.length; i++) {
+        subtaskNames.push(response[i].fields.summary);
+      }
+      return subtaskNames;
+    };
+
+    _self.collectMissingSubtaskNames = function(existingSubtaskNames) {
+      let missingSubtaskNames = [];
+      for (let i = 0; i < _self.taskNames.length; i++) {
+        let checkingTaskName = _self.taskNames[i];
+        let checkingTaskNameCooked = _self.cook(checkingTaskName);
+        let found = false;
+        for (let j = 0; j < existingSubtaskNames.length; j++) {
+          if (_self.cook( existingSubtaskNames[j] ).includes( checkingTaskNameCooked )) {
+            found = true;
+            break;
+          }
+        }
+        if ( ! found) {
+          missingSubtaskNames.push(checkingTaskName);
         }
       }
+      return missingSubtaskNames;
+    };
+
+    _self.cook = function(input) {
+      return input.toUpperCase().replace(/\s/g, '');
+    };
+
+    _self.shift = function(projectKey, issueKey, taskName, lightHook) {
+      fetch("https://jira.axonivy.com/jira/rest/api/2/issue/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: _self.createPayloadToAddIssue(projectKey, issueKey, taskName)
+      })
+      .then(function(rs){
+        if (rs.ok) {
+          _self.insertSuccessDot(lightHook);
+        } else {
+          _self.insertFailureDot(lightHook);
+        }
+      })
+      .catch(function(error){
+        console.error(error);
+        _self.insertFailureDot(lightHook);
+      });
     };
 
     _self.createPayloadToAddIssue = function(projectKey, issueKey, taskName) {
@@ -137,7 +186,7 @@
   chrome.storage.local.get(["cfg"], function(storage) {
     var rawCfg = storage.cfg || {};
     var myApp = new app();
-    myApp.setTasksToCreate(["Check sonar", "Crosscheck"]);
+    myApp.setTasksToCreate(["Sonar", "Crosscheck"]);
     myApp.watch();
   });
 })();

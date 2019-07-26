@@ -8,17 +8,16 @@
     _self.currentWrapper = {};
 
     _self.watch = function() {
-      _self.ports = document.querySelectorAll('span[data-fieldname="sprintName"]');
-      if (_self.ports.length) {
-        _self.nail();
-      } else {
-        _self.countDown--;
-        if (_self.countDown < 0) {
-          _self.yell("Found no port to mount the trigger!");
-        } else {
-          setTimeout(_self.watch, 1000);
+      document.addEventListener("keydown", function(event){
+        if (event.code === "KeyF" && event.shiftKey && event.ctrlKey) {
+          _self.ports = document.querySelectorAll('span[data-fieldname="sprintName"]');
+          if (_self.ports.length) {
+            _self.nail();
+          } else {
+            _self.yell("Found no port to mount the trigger!");
+          }
         }
-      }
+      });
     };
 
     _self.yell = function(msg) {
@@ -28,10 +27,14 @@
       ae.className = "alert";
       ae.appendChild(document.createTextNode(msg));
       ae.appendChild(closeBtn);
-      closeBtn.addEventListener("click", function(){
-        document.body.removeChild(ae);
-      });
       document.body.appendChild(ae);
+
+      let dismissCallback = function() {
+        document.body.removeChild(ae);
+      };
+
+      //closeBtn.addEventListener("click", dismissCallback);
+      setTimeout(dismissCallback, 3000);
     };
 
     _self.nail = function() {
@@ -134,7 +137,7 @@
   chrome.storage.local.get(["cfg"], function(storage) {
     var rawCfg = storage.cfg || {};
     var myApp = new app();
-    myApp.setTasksToCreate(["Sonar?", "Crosscheck"]);
+    myApp.setTasksToCreate(["Check sonar", "Crosscheck"]);
     myApp.watch();
   });
 })();

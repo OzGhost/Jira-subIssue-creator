@@ -65,7 +65,9 @@
       let target = _self.ports[targetPortIndex];
       let pid = target.parentNode.parentNode.getAttribute("data-sprint-id");
       //let sprintName = target.getAttribute("data-fieldvalue");
-      fetch("https://jira.axonivy.com/jira/rest/agile/1.0/sprint/"+pid+"/issue?jql=issueType%3DBug%20or%20issueType%3DStory")
+      fetch("https://jira.axonivy.com/jira/rest/agile/1.0/sprint/"
+              +pid
+            +"/issue?jql=issueType%3DBug%20or%20issueType%3DStory%20or%20issueType%3DImprovement%20or%20issueType%3DDuty")
       .then(function(response){
         return response.json();
       })
@@ -77,18 +79,6 @@
           _self.createTaskOn(issue.fields.project.key, issue.key);
         }
       });
-    };
-
-    _self.insertSuccessDot = function(container) {
-      let dot = document.createElement("i");
-      dot.className = "dot success";
-      container.appendChild(dot);
-    };
-
-    _self.insertFailureDot = function(container) {
-      let dot = document.createElement("i");
-      dot.className = "dot failure";
-      container.appendChild(dot);
     };
 
     _self.createTaskOn = function(projectKey, issueKey) {
@@ -107,6 +97,9 @@
           let currentSubtaskNames = _self.extractSubtaskNames(body);
           let missingSubtaskNames = _self.collectMissingSubtaskNames(currentSubtaskNames);
           let len = missingSubtaskNames.length;
+          if ( ! len) {
+            _self.insertNoopDot(lightHook);
+          }
           for (let i = 0; i < len; i++) {
             _self.shift(projectKey, issueKey, missingSubtaskNames[i], lightHook);
             //console.log("simulate: create task "+missingSubtaskNames[i]+" on project "+projectKey+" with issue key "+issueKey);
@@ -175,6 +168,25 @@
       return '{"fields":{"project":{"key": "'+projectKey+'"},"parent":{"key": "'
         +issueKey+'"},"summary":"'+taskName+'","issuetype":{"id":"8"},"customfield_11200":{"id":"10504"}}}';
     };
+
+    _self.insertSuccessDot = function(container) {
+      let dot = document.createElement("i");
+      dot.className = "dot success";
+      container.appendChild(dot);
+    };
+
+    _self.insertSuccessDot = function(container) {
+      let dot = document.createElement("i");
+      dot.className = "dot success";
+      container.appendChild(dot);
+    };
+
+    _self.insertNoopDot = function(container) {
+      let dot = document.createElement("i");
+      dot.className = "dot noop";
+      container.appendChild(dot);
+    };
+
 
     _self.setTasksToCreate = function(taskNames) {
       _self.taskNames = taskNames;

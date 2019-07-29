@@ -71,3 +71,8 @@
   background-color: #e17d60;
 }
 
+.dot.noop {
+  background-color: transparent;
+  border: 1px solid grey;
+}
+

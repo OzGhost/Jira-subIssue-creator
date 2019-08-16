@@ -63,22 +63,57 @@
 
         _self.fireOn = function(targetPortIndex) {
             let target = _self.ports[targetPortIndex];
-            let pid = target.parentNode.parentNode.getAttribute("data-sprint-id");
-            //let sprintName = target.getAttribute("data-fieldvalue");
-            fetch("https://jira.axonivy.com/jira/rest/agile/1.0/sprint/"
-                            +pid
-                        +"/issue?jql=issueType%3DBug%20or%20issueType%3DStory%20or%20issueType%3DImprovement%20or%20issueType%3DDuty")
-            .then(function(response){
-                return response.json();
-            })
-            .then(function(json){
-                let issues = json.issues;
-                let len = issues.length;
-                for (let i = 0; i < len; i++) {
-                    let issue = issues[i];
-                    _self.createTaskOn(issue.fields.project.key, issue.key);
+            let backlogContainer = _self.findBacklogContainer(target);
+            let issueIds = _self.scanViewForIssueIds(backlogContainer);
+            let len = issueIds.length;
+            for (let i = 0; i < len; i++) {
+                let iKey = issueIds[i];
+                _self.loadRequiredInfo(iKey, function(info){
+                    _self.createTaskOn(info.prjKey, iKey);
+                });
+            }
+            return;
+        };
+
+        _self.findBacklogContainer = function(node) {
+            let headerHit = false;
+            let scanningNode = node;
+            while (scanningNode != null) {
+                if (scanningNode.getAttribute("data-sprint-id")) {
+                    if (headerHit) {
+                        return scanningNode;
+                    }
+                    headerHit = true;
                 }
-            });
+                scanningNode = scanningNode.parentNode;
+            }
+            return undefined;
+        };
+
+        _self.scanViewForIssueIds = function(container) {
+            let tags = container.querySelectorAll("a.js-key-link");
+            let len = tags.length;
+            let output = [];
+            for (let i = 0; i < len; ++i) {
+                output.push(tags[i].title);
+            }
+            return output;
+        };
+
+        _self.loadRequiredInfo = function(iKey, riConsumer) {
+            fetch("https://jira.axonivy.com/jira/rest/agile/1.0/issue/" + iKey)
+                .then(function(e){ return e.json(); })
+                .then(function(rs){
+                    let info = {};
+                    info.id = rs.id;
+                    info.prjKey = rs.fields.project.key;
+                    info.teamId = rs.fields.customfield_11200.id;
+                    info.teamName = rs.fields.customfield_11200.value;
+                    riConsumer(info);
+                })
+                .catch(function(e) {
+                    console.error(e);
+                });
         };
 
         _self.createTaskOn = function(projectKey, issueKey) {
@@ -88,11 +123,10 @@
             if (lightHook) {
                 lightHook = _self.currentWrapper.querySelector(ik);
             }
-            if (lightHook) {
-                fetch("https://jira.axonivy.com/jira/rest/api/2/issue/"+issueKey+"/subtask")
-                .then(function(rs){
-                    return rs.json();
-                })
+            if ( ! lightHook)
+                return;
+            fetch("https://jira.axonivy.com/jira/rest/api/2/issue/"+issueKey+"/subtask")
+                .then(function(rs){ return rs.json(); })
                 .then(function(body) {
                     let currentSubtaskNames = _self.extractSubtaskNames(body);
                     let missingSubtaskNames = _self.collectMissingSubtaskNames(currentSubtaskNames);
@@ -109,7 +143,6 @@
                     console.error(error);
                     _self.insertFailureDot(lightHook);
                 });
-            }
         };
 
         _self.extractSubtaskNames = function(response) {
@@ -201,4 +234,5 @@
         myApp.setTasksToCreate(["Sonar", "Crosscheck"]);
         myApp.watch();
     });
+
 })();

@@ -4,16 +4,19 @@
         var _self = this;
         _self.ports = [];
         _self.taskNames = [];
-        _self.countDown = 10;
 
         _self.watch = function() {
             document.addEventListener("keydown", function(event){
-                if (event.code === "KeyF" && event.shiftKey && event.ctrlKey) {
-                    _self.ports = document.querySelectorAll('span[data-fieldname="sprintName"]');
-                    if (_self.ports.length) {
-                        _self.nail();
-                    } else {
-                        _self.yell("Found no port to mount the trigger!");
+                if (event.shiftKey && event.ctrlKey) {
+                    if (event.code === "KeyF") {
+                        _self.ports = document.querySelectorAll('span[data-fieldname="sprintName"]');
+                        if (_self.ports.length) {
+                            _self.nail();
+                        } else {
+                            _self.yell("Found no port to mount the trigger!");
+                        }
+                    } else if (event.code === "KeyE") {
+                        _self.openConfigurator();
                     }
                 }
             });
@@ -217,6 +220,12 @@
 
         _self.setTasksToCreate = function(taskNames) {
             _self.taskNames = taskNames;
+        };
+
+        _self.openConfigurator = function() {
+            let configurator = document.createElement("div");
+            configurator.className = "configurator";
+            document.body.appendChild(configurator);
         };
 
     };

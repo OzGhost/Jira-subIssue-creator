@@ -5,7 +5,6 @@
         _self.ports = [];
         _self.taskNames = [];
         _self.countDown = 10;
-        _self.currentWrapper = {};
 
         _self.watch = function() {
             document.addEventListener("keydown", function(event){
@@ -45,7 +44,6 @@
                 btn.addEventListener("click", function() {
                     _self.fireOn(i);
                     _self.nodeUnnail(i, btn);
-                    _self.currentWrapper = _self.ports[i].parentNode.parentNode.parentNode.parentNode;
                 });
                 _self.nodeNail(i, btn);
             }
@@ -64,12 +62,14 @@
         _self.fireOn = function(targetPortIndex) {
             let target = _self.ports[targetPortIndex];
             let backlogContainer = _self.findBacklogContainer(target);
-            let issueIds = _self.scanViewForIssueIds(backlogContainer);
-            let len = issueIds.length;
+            let issueAnchors = backlogContainer.querySelectorAll("a.js-key-link");
+            let len = issueAnchors.length;
             for (let i = 0; i < len; i++) {
-                let iKey = issueIds[i];
+                let iAnchor = issueAnchors[i];
+                let iKey = iAnchor.title;
+                _self.insertCalmDot(iAnchor);
                 _self.loadRequiredInfo(iKey, function(info){
-                    _self.createTaskOn(info.prjKey, iKey);
+                    _self.createTaskOn(info.prjKey, iKey, iAnchor);
                 });
             }
             return;
@@ -90,16 +90,6 @@
             return undefined;
         };
 
-        _self.scanViewForIssueIds = function(container) {
-            let tags = container.querySelectorAll("a.js-key-link");
-            let len = tags.length;
-            let output = [];
-            for (let i = 0; i < len; ++i) {
-                output.push(tags[i].title);
-            }
-            return output;
-        };
-
         _self.loadRequiredInfo = function(iKey, riConsumer) {
             fetch("https://jira.axonivy.com/jira/rest/agile/1.0/issue/" + iKey)
                 .then(function(e){ return e.json(); })
@@ -116,15 +106,7 @@
                 });
         };
 
-        _self.createTaskOn = function(projectKey, issueKey) {
-            let ik = 'a[href$="' + issueKey + '"]';
-            let lightHook = _self.currentWrapper
-                            && _self.currentWrapper.querySelector;
-            if (lightHook) {
-                lightHook = _self.currentWrapper.querySelector(ik);
-            }
-            if ( ! lightHook)
-                return;
+        _self.createTaskOn = function(projectKey, issueKey, lightHook) {
             fetch("https://jira.axonivy.com/jira/rest/api/2/issue/"+issueKey+"/subtask")
                 .then(function(rs){ return rs.json(); })
                 .then(function(body) {
@@ -135,8 +117,8 @@
                         _self.insertNoopDot(lightHook);
                     }
                     for (let i = 0; i < len; i++) {
-                        _self.shift(projectKey, issueKey, missingSubtaskNames[i], lightHook);
-                        //console.log("simulate: create task "+missingSubtaskNames[i]+" on project "+projectKey+" with issue key "+issueKey);
+                        //_self.shift(projectKey, issueKey, missingSubtaskNames[i], lightHook);
+                        console.log("simulate: create task "+missingSubtaskNames[i]+" on project "+projectKey+" with issue key "+issueKey);
                     }
                 })
                 .catch(function(error){
@@ -214,7 +196,19 @@
             _self.insertDot(container, "noop");
         };
 
+        _self.insertCalmDot = function(container) {
+            _self.insertDot(container, "calm");
+        };
+
         _self.insertDot = function(container, type) {
+            let leave = container.childNodes;
+            let len = leave.length;
+            for (let i = 0; i < len; ++i) {
+                if (leave[i].className === "dot calm") {
+                    container.removeChild(leave[i]);
+                    break;
+                }
+            }
             let dot = document.createElement("i");
             dot.className = "dot " + type;
             container.appendChild(dot);

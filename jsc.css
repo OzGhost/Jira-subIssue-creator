@@ -113,11 +113,11 @@
 
 .front {
     width: 600px;
-    height: 200px;
+    height: 170px;
     background-color: white;
-    padding: 10px 20px;
+    padding: 16px 28px;
     position: absolute;
-    top: calc(50% - 105px);
+    top: calc(50% - 85px);
     left: calc(50% - 310px);
 }
 
@@ -142,27 +142,33 @@
 .front button {
     display: block;
     width: 100%;
-    padding: 6px 12px;
-    background-color: black;
+    padding: 10px 12px;
+    background-color: #616161;
     border: 0;
     color: white;
     cursor: pointer;
-}
-
-.front button:hover {
-    -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .front button.primitive {
     padding: 18px 20px;
     font-size: 20px;
     margin-bottom: 8px;
-    background-color: lightgreen;
+    background-color: #0088cc;
 }
 
 .isubtask span {
     color: red;
     cursor: pointer;
     padding: 0 4px;
+}
+
+.front p {
+    border-bottom: 1px dashed #0088cc;
+    margin-bottom: 4px;
+}
+
+.front button:hover,
+.isubtask span:hover {
+    -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 

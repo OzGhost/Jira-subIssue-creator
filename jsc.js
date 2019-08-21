@@ -16,7 +16,7 @@
                         +'</div>'
                         +'<div class="ctrl">'
                             +'<p>Your input, sir</p>'
-                            +'<form id="input-form"><input type="text" placeholder="Subtask\'s name..." /></form>'
+                            +'<input id="stn-input" type="text" placeholder="Subtask\'s name..." />'
                             +'<button id="submit" class="primitive">Save</button>'
                             +'<button id="cancel">Cancel</button>'
                         +'</div>'
@@ -35,15 +35,14 @@
                 _self.putToShelf(_self.iCollection[i]);
             }
 
-            let fr = _self.cage.querySelector("form#input-form");
-            if ( ! fr) return;
-            let ip = fr.querySelector("input");
+            let ip = _self.cage.querySelector("#stn-input");
             if ( ! ip) return;
-            fr.addEventListener("submit", function(e){
-                e.preventDefault();
-                let val = ip.value;
-                _self.add( val );
-                ip.value = "";
+            ip.addEventListener("keydown", function(e){
+                if (e.code == "Enter") {
+                    let val = ip.value;
+                    _self.add( val );
+                    ip.value = "";
+                }
             });
 
             let submitTrigger = _self.cage.querySelector("#submit");
@@ -86,6 +85,7 @@
 
         _self.add = function(val) {
             let valTrim = val.trim();
+            if ( ! valTrim.length) return;
             let len = _self.iCollection.length;
             for (let i = 0; i < len; ++i) {
                 if (valTrim.toUpperCase() === _self.iCollection[i].toUpperCase())

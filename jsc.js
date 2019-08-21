@@ -24,13 +24,20 @@
                 +'</div>';
 
         _self.install = function() {
+            let oCol = _self.iCollection;
+            let len = oCol.length;
+            _self.iCollection = [];
+            for (let i = 0; i < len; ++i) {
+                _self.iCollection.push( oCol[i] );
+            }
+
             _self.cage = document.createElement("div");
             _self.cage.innerHTML = _self.frame;
             document.body.appendChild(_self.cage);
 
             _self.shelf = _self.cage.querySelector("#stn");
             if ( ! _self.shelf) return;
-            let len = _self.iCollection.length;
+            len = _self.iCollection.length;
             for (let i = 0; i < len; ++i) {
                 _self.putToShelf(_self.iCollection[i]);
             }

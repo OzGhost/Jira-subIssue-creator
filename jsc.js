@@ -168,7 +168,7 @@
                 let iKey = iAnchor.title;
                 _self.insertCalmDot(iAnchor);
                 _self.loadRequiredInfo(iKey, function(info){
-                    _self.createTaskOn(info.prjKey, iKey, iAnchor);
+                    _self.createTaskOn(info, iKey, iAnchor);
                 });
             }
             return;
@@ -205,7 +205,7 @@
                 });
         };
 
-        _self.createTaskOn = function(projectKey, issueKey, lightHook) {
+        _self.createTaskOn = function(info, issueKey, lightHook) {
             fetch("https://jira.axonivy.com/jira/rest/api/2/issue/"+issueKey+"/subtask")
                 .then(function(rs){ return rs.json(); })
                 .then(function(body) {
@@ -216,8 +216,8 @@
                         _self.insertNoopDot(lightHook);
                     }
                     for (let i = 0; i < len; i++) {
-                        //_self.shift(projectKey, issueKey, missingSubtaskNames[i], lightHook);
-                        console.log("simulate: create task "+missingSubtaskNames[i]+" on project "+projectKey+" with issue key "+issueKey);
+                        _self.shift(info, issueKey, missingSubtaskNames[i], lightHook);
+                        //console.log("simulate: create task "+missingSubtaskNames[i]+" on project "+info.prjKey+" with issue key "+issueKey);
                     }
                 })
                 .catch(function(error){
@@ -257,13 +257,13 @@
             return input.toUpperCase().replace(/\s/g, '');
         };
 
-        _self.shift = function(projectKey, issueKey, taskName, lightHook) {
+        _self.shift = function(info, issueKey, taskName, lightHook) {
             fetch("https://jira.axonivy.com/jira/rest/api/2/issue/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: _self.createPayloadToAddIssue(projectKey, issueKey, taskName)
+                body: _self.createPayloadToAddIssue(info, issueKey, taskName)
             })
                 .then(function(rs){
                     if (rs.ok) {
@@ -278,9 +278,9 @@
                 });
         };
 
-        _self.createPayloadToAddIssue = function(projectKey, issueKey, taskName) {
-            return '{"fields":{"project":{"key": "'+projectKey+'"},"parent":{"key": "'
-                +issueKey+'"},"summary":"'+taskName+'","issuetype":{"id":"8"},"customfield_11200":{"id":"10504"}}}';
+        _self.createPayloadToAddIssue = function(info, issueKey, taskName) {
+            return '{"fields":{"project":{"key": "'+info.prjKey+'"},"parent":{"key": "'
+                +issueKey+'"},"summary":"'+taskName+'","issuetype":{"id":"8"},"customfield_11200":{"id":"'+info.teamId+'"}}}';
         };
 
         _self.insertFailureDot = function(container) {

@@ -11,6 +11,11 @@
       "run_at": "document_end"
     }
   ],
-  "manifest_version": 2
+  "manifest_version": 2,
+  "icons": {
+      "16": "i16.png",
+      "48": "i48.png",
+      "128": "i128.png"
+  }
 }
 

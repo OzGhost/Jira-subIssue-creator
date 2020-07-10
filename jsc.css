@@ -172,3 +172,61 @@
     -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+.stick.calm {
+    position: relative;
+    display: inline-block;
+    height: 16px;
+    width: 3px;
+    border: 0;
+    margin: 0;
+}
+.stick.calm:before {
+    content: "";
+    position: absolute;
+    top: 0%;
+    left: 0;
+    height: 25%;
+    width: 100%;
+    border-radius: 1.5px;
+    background: orange;
+    -webkit-animation: flattening 1s linear 0s infinite alternate;
+    animation: flattening 1s linear 0s infinite alternate;
+}
+
+@-webkit-keyframes flattening {
+    0% {
+        top: 0%;
+        height: 25%;
+    }
+    15% {
+        top: 10%;
+        height: 60%;
+    }
+    85% {
+        top: 30%;
+        height: 60%;
+    }
+    100% {
+        top: 75%;
+        height: 25%;
+    }
+}
+
+@keyframes flattening {
+    0% {
+        top: 0%;
+        height: 25%;
+    }
+    15% {
+        top: 10%;
+        height: 60%;
+    }
+    85% {
+        top: 30%;
+        height: 60%;
+    }
+    100% {
+        top: 75%;
+        height: 25%;
+    }
+}

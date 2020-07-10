@@ -96,5 +96,5 @@ var Configurator = function(iCollection, submitCallback) {
 };
 
 var cfg = new Configurator(["Sonar", "Crosscheck"], function(col) { console.log(col) });
-cfg.install();
+//cfg.install();
 

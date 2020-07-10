@@ -120,6 +120,13 @@
                         }
                     } else if (event.code === "KeyE") {
                         _self.openConfigurator();
+                    } else if (event.code === "KeyV") {
+                        _self.ports = document.querySelectorAll('span[data-fieldname="sprintName"]');
+                        if (_self.ports.length) {
+                            _self.poisonMark();
+                        } else {
+                            _self.yell("Found no port to mount the trigger!");
+                        }
                     }
                 }
             });
@@ -158,7 +165,8 @@
         _self.nodeNail = function(targetPortIndex, node) {
             _self.ports[targetPortIndex].parentNode.parentNode.insertBefore(
                 node,
-                _self.ports[targetPortIndex].parentNode.nextSibling.nextSibling);
+                _self.ports[targetPortIndex].parentNode.nextSibling.nextSibling
+            );
         };
 
         _self.nodeUnnail = function(targetPortIndex, node) {
@@ -320,7 +328,6 @@
             container.appendChild(dot);
         };
 
-
         _self.setTasksToCreate = function(taskNames) {
             _self.taskNames = taskNames;
         };
@@ -331,6 +338,19 @@
                     window.location.reload();
                 });
             }).install();
+        };
+        
+        _self.poisonMark = function() {
+            let len = _self.ports.length;
+            for (let i = 0; i < len; i++) {
+                let btn = document.createElement("btn");
+                btn.className = "poisonmark";
+                btn.addEventListener("click", function() {
+                    //_self.fireOn(i);
+                    _self.nodeUnnail(i, btn);
+                });
+                _self.nodeNail(i, btn);
+            }
         };
     };
 

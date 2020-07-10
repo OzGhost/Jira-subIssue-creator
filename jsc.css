@@ -188,7 +188,7 @@
     height: 25%;
     width: 100%;
     border-radius: 1.5px;
-    background: orange;
+    background: #ff9a76;
     -webkit-animation: flattening 1s linear 0s infinite alternate;
     animation: flattening 1s linear 0s infinite alternate;
 }
@@ -230,3 +230,59 @@
         height: 25%;
     }
 }
+
+.poisonmark {
+    position: relative;
+    margin: 0 0 0 10px;
+    border: 0;
+    padding: 0;
+    display: inline-block;
+    cursor: pointer;
+    width: 10px;
+    height: 12px;
+}
+
+.poisonmark:after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: #e8505b;
+    transform: rotate(45deg);
+    -webkit-animation: bouncing 0.5s ease 0s infinite alternate;
+    animation: bouncing 0.5s ease 0s infinite alternate;
+}
+
+.poisonmark:before {
+    content: "";
+    position: absolute;
+    top: 5.5px;
+    left: 1px;
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #ff9a76;
+    transform: rotate(45deg);
+}
+
+@-webkit-keyframes bouncing {
+    from {
+        top: -1px;
+    }
+    to {
+        top: 1px;
+    }
+}
+
+@keyframes bouncing {
+    from {
+        top: -1px;
+    }
+    to {
+        top: 1px;
+    }
+}
+

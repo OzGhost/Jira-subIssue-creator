@@ -343,14 +343,56 @@
         _self.poisonMark = function() {
             let len = _self.ports.length;
             for (let i = 0; i < len; i++) {
+                let ready = false;
                 let btn = document.createElement("btn");
                 btn.className = "poisonmark";
                 btn.addEventListener("click", function() {
+                    if (ready) {
+                        _self.nodeUnnail(i, btn);
+                    } else {
+                        btn.className = "poisonmark active";
+                        _self.bulkMark(i);
+                    }
+                    ready = true;
                     //_self.fireOn(i);
-                    _self.nodeUnnail(i, btn);
                 });
                 _self.nodeNail(i, btn);
             }
+        };
+
+        _self.bulkMark = function(targetPortIndex) {
+            let target = _self.ports[targetPortIndex];
+            let backlogContainer = _self.findBacklogContainer(target);
+            let issueAnchors = backlogContainer.querySelectorAll("a.js-key-link");
+            let len = issueAnchors.length;
+            for (let i = 0; i < len; i++) {
+                let iAnchor = issueAnchors[i];
+                let iKey = iAnchor.title;
+                let icon = _self.imark(iAnchor);
+                icon.addEventListener("click", function(e){
+                    e && e.preventDefault();
+                    e && e.stopPropagation();
+                    iAnchor.removeChild(icon);
+                    _self.insertStick(iAnchor, "calm");
+                });
+                //_self.loadRequiredInfo(iKey, function(info){
+                    //_self.createTaskOn(info, iKey, iAnchor);
+                //});
+            }
+            return;
+        };
+
+        _self.imark = function(container) {
+            let t = document.createElement("btn");
+            t.className = "poisonmark active sub";
+            container.appendChild(t);
+            return t;
+        };
+
+        _self.insertStick = function(container, type) {
+            let dot = document.createElement("i");
+            dot.className = "stick " + type;
+            container.appendChild(dot);
         };
     };
 

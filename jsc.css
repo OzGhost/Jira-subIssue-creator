@@ -178,7 +178,7 @@
     height: 16px;
     width: 3px;
     border: 0;
-    margin: 0;
+    margin: 0 0 0 10px;
 }
 .stick.calm:before {
     content: "";
@@ -233,20 +233,20 @@
 
 .poisonmark {
     position: relative;
-    margin: 0 0 0 10px;
+    margin: 0 0 0 0px;
     border: 0;
     padding: 0;
     display: inline-block;
     cursor: pointer;
-    width: 10px;
-    height: 12px;
+    width: 22px;
+    height: 16px;
 }
 
 .poisonmark:after {
     content: "";
     position: absolute;
     top: -1px;
-    left: 0;
+    left: 6px;
     display: inline-block;
     width: 10px;
     height: 10px;
@@ -255,12 +255,24 @@
     -webkit-animation: bouncing 0.5s ease 0s infinite alternate;
     animation: bouncing 0.5s ease 0s infinite alternate;
 }
+.poisonmark.active:after {
+    transform: rotate(0deg);
+    left: 5px;
+    border-radius: 6px 0 6px 0;
+    width: 12px;
+    height: 12px;
+    -webkit-animation: rolling 0.5s linear 0s infinite;
+    animation: rolling 0.5s linear 0s infinite;
+}
+.poisonmark.active.sub:after {
+    border-radius: 6px 6px 6px 0;
+}
 
 .poisonmark:before {
     content: "";
     position: absolute;
     top: 5.5px;
-    left: 1px;
+    left: 7px;
     display: inline-block;
     width: 8px;
     height: 8px;

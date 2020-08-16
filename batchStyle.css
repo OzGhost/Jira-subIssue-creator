@@ -1,0 +1,228 @@
+.bc-hollow {
+    position: fixed;
+    bottom: 24px;
+    right: 32px;
+    z-index: 1201;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    outline-color: #fff;
+    outline-width: 0;
+    outline-style: none;
+    cursor: pointer;
+}
+.bc-icon {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ff5252;
+    position: relative;
+    box-shadow: 2px 2px 4px #333;
+}
+.bc-icon:before {
+    content: "";
+    display: block;
+    width: 0;
+    height: 0;
+    border-top: 0;
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+    border-bottom: 8px solid #ff5252;
+    position: absolute;
+    top: -3px;
+    left: 1px;
+    transform: rotate(-35deg);
+}
+.bc-icon:after {
+    content: "";
+    display: block;
+    width: 0;
+    height: 0;
+    border-top: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 10px solid #ff5252;
+    position: absolute;
+    top: 3px;
+    right: -7px;
+    transform: rotate(65deg);
+}
+.bc-ground {
+    display: block;
+    position: fixed;
+    z-index: 1199;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(125, 125, 125, 0.7);
+}
+.bc-screen{
+    position: fixed;
+    width: 70vw;
+    height: 70vh;
+    left: 15vw;
+    top: 15vh;
+    box-sizing: border-box;
+    padding: 20px 32px;
+    background-color: white;
+    z-index: 1200;
+    color: rgba(0,0,0,0.87);
+}
+.i-tray {
+    height: calc(100% - 48px);
+    overflow: auto;
+}
+.i-ctl {
+    height: 32px;
+    padding: 8px 0;
+    border-top: 1px dashed #ccc;
+}
+.i-ctl * {
+    display: inline-block;
+    float: left;
+    line-height: 32px;
+}
+.i-ctl input {
+    height: 100%;
+    box-sizing: border-box;
+    width: calc(100% - 257px);
+    border: 1px solid #ccc;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin: 0;
+    outline-color: #fff;
+    outline-width: 0;
+    outline-style: none;
+}
+.i-ctl .bc-btn {
+    margin-left: 4px;
+    border: 0;
+}
+.bc-btn {
+    display: inline;
+    box-sizing: border-box;
+    text-align: center;
+    border: 1px solid #ccc;
+    background-color: white;
+    margin: 0;
+    height: 100%;
+    cursor: pointer;
+    outline-color: #fff;
+    outline-width: 0;
+    outline-style: none;
+}
+.m-close {
+    width: 80px;
+    background: #eee;
+    color: rgba(0,0,0,0.87);
+}
+.m-dismiss {
+    width: 85px;
+    background: #ff5252;
+    color: #fff;
+}
+.m-submit {
+    width: 80px;
+    background: #4caf50;
+    color: #fff;
+}
+.i-tray-title {
+    margin: 0 auto 10px 0;
+    font-size: 20px;
+    text-decoration: underline double #e8e8e8;
+}
+.i-empty {
+    text-align: center;
+    padding: 10px 16px;
+    border: 1px solid #fb8c00;
+    color: #fb8c00;
+}
+.i-set {
+    margin-bottom: 4px;
+    height: 32px;
+    line-height: 32px;
+}
+.i-set * {
+    display: inline-block;
+    float: left;
+}
+.i-set:after {
+    content: "";
+    display: block;
+    clear: both;
+    width: 100%;
+    height: 0;
+    border: 0;
+    padding: 0;
+}
+.i-set input {
+    outline-color: #fff;
+    outline-width: 0;
+    outline-style: none;
+    border: 1px solid #ccc;
+    height: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+    box-sizing: border-box;
+    width: calc(100% - 68px);
+}
+.i-set .bc-btn {
+    margin-left: 4px;
+}
+.s-rm {
+    border-color: #ff5252;
+    color: #ff5252;
+    width: 40px;
+}
+.s-stat {
+    position: relative;
+    width: 20px;
+}
+
+.s-stat.still:before,
+.s-stat.await:before {
+    content: "";
+    height: 0;
+    width: 10px;
+    border-bottom: 2px solid #ccc;
+    position: absolute;
+    top: 15px;
+    left: 4px;
+}
+.s-stat.await:before {
+    animation: rolling 0.4s linear 0s infinite;
+}
+.s-stat.pass:before,
+.s-stat.pass:after {
+    content: "";
+    position: absolute;
+    bottom: 10px;
+    left: 6.5px;
+    width: 0;
+    height: 5px;
+    border-left: 2px solid #4caf50;
+    transform: rotate(-45deg);
+    transform-origin: 0% 100%;
+}
+.s-stat.pass:after {
+    height: 10px;
+    transform: rotate(45deg);
+}
+.s-stat.error:after,
+.s-stat.error:before {
+    content: "";
+    position: absolute;
+    bottom: 10px;
+    left: 7.5px;
+    width: 0;
+    height: 10px;
+    border-left: 2px solid #ff5252;
+    transform: rotate(-45deg);
+}
+.s-stat.error:after {
+    transform: rotate(45deg);
+}
+

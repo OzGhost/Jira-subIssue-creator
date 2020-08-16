@@ -1,21 +1,28 @@
 {
-  "name": "Jira-subIssue-creator",
-  "version": "1.0",
-  "description": "A chrome extension to create sub-issue automatically for every story in a specified sprint",
-  "permissions": ["activeTab", "storage", "webNavigation"],
-  "content_scripts": [
-    {
-      "matches": ["https://jira.axonivy.com/*"],
-      "css": ["jsc.css"],
-      "js": ["jsc.js"],
-      "run_at": "document_end"
+    "name": "Jira-subIssue-creator",
+    "version": "1.0",
+    "description": "A chrome extension to create sub-issue automatically for every story in a specified sprint",
+    "permissions": ["activeTab", "storage", "webNavigation"],
+    "content_scripts": [
+        {
+            "matches": ["https://jira.axonivy.com/*"],
+            "css": [
+                "jsc.css",
+                "batchStyle.css"
+            ],
+            "js": [
+                "jsc.js",
+                "vue.js",
+                "batchCreator.js"
+            ],
+            "run_at": "document_end"
+        }
+    ],
+    "manifest_version": 2,
+    "icons": {
+        "16": "i16.png",
+        "48": "i48.png",
+        "128": "i128.png"
     }
-  ],
-  "manifest_version": 2,
-  "icons": {
-      "16": "i16.png",
-      "48": "i48.png",
-      "128": "i128.png"
-  }
 }
 

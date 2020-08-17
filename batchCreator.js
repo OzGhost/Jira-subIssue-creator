@@ -48,6 +48,8 @@
         },
         methods: {
             trigger: function(){
+                this.prj = "";
+                this.issue = "";
                 if (this.extended) {
                     this.extended = false;
                 } else {

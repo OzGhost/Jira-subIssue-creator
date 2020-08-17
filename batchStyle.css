@@ -1,3 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway&display=swap');
+
+#batch-creator {
+    font-family: 'Raleway', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+}
 .bc-hollow {
     position: fixed;
     bottom: 24px;
@@ -51,7 +58,21 @@
     border: 1px solid #ff5252;
     color: #ff5252;
     display: inline-block;
-    animation: error-in 0.3s forwards;
+    background: #fff;
+}
+.error-enter-active {
+    animation: rise-up 0.3s ease-in forwards;
+}
+@keyframes rise-up {
+    from {
+        bottom: 0px;
+    }
+    to {
+        bottom: 20px;
+    }
+}
+.error-enter-active .bc-error-panel {
+    animation: error-in 0.3s ease-out forwards;
 }
 @keyframes error-in {
     from {
@@ -61,8 +82,19 @@
         left: 0%;
     }
 }
-.bc-error-panel.out {
-    animation: error-out 0.3s forwards;
+.error-leave-active {
+    animation: rise-down 0.3s ease-out forwards;
+}
+@keyframes rise-down {
+    from {
+        bottom: 20px;
+    }
+    to {
+        bottom: 0px;
+    }
+}
+.error-leave-active .bc-error-panel {
+    animation: error-out 0.3s ease-in forwards;
 }
 @keyframes error-out {
     from {

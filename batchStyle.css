@@ -35,6 +35,43 @@
     left: 1px;
     transform: rotate(-35deg);
 }
+.bc-error-shell {
+    position: fixed;
+    bottom: 20px;
+    right: 82px;
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    z-index: 1202;
+    overflow: hidden;
+}
+.bc-error-panel {
+    position: relative;
+    padding: 10px 16px;
+    border: 1px solid #ff5252;
+    color: #ff5252;
+    display: inline-block;
+    animation: error-in 0.3s forwards;
+}
+@keyframes error-in {
+    from {
+        left: 100%;
+    }
+    to {
+        left: 0%;
+    }
+}
+.bc-error-panel.out {
+    animation: error-out 0.3s forwards;
+}
+@keyframes error-out {
+    from {
+        left: 0%;
+    }
+    to {
+        left: 100%;
+    }
+}
 .bc-icon:after {
     content: "";
     display: block;

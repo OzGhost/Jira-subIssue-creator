@@ -1,5 +1,6 @@
 'use strict';
 (function(){
+    if ( ! /jira\/browse\/[A-Z]+-[0-9]+/.test(window.location.href)) return;
     var idGen = (function(){
         var cid = 0;
         return function(){
@@ -11,7 +12,10 @@
     tag.id = 'bc-frame';
     tag.innerHTML = ''
         +'<div id="batch-creator">'
-        +'  <button class="bc-hollow" @click="extended = !extended"><span class="bc-icon"></span></button>'
+        +'  <button class="bc-hollow" @click="trigger"><span class="bc-icon"></span></button>'
+        +'  <p class="bc-error-shell" v-if="error">'
+        +'      <span class="bc-error-panel">Found projectKey=[{{ prj }}] and issueKey=[{{ issue }}]. Maybe something went wrong with one of them!</span>'
+        +'  </p>'
         +'  <div class="bc-ground" v-if="extended"></div>'
         +'  <div class="bc-screen" v-if="extended">'
         +'      <div class="i-tray">'
@@ -37,9 +41,41 @@
         el: '#batch-creator',
         data: {
             extended: false,
-            subs: []
+            error: false,
+            subs: [],
+            prj: "",
+            issue: ""
         },
         methods: {
+            trigger: function(){
+                if (this.extended) {
+                    this.extended = false;
+                } else {
+                    var prjAnchor = document.getElementById('project-name-val');
+                    var href = "";
+                    if (prjAnchor && prjAnchor.nodeName == 'A' && prjAnchor.href) {
+                        href = prjAnchor.href;
+                        this.prj = href.substring(href.lastIndexOf('/')+1);
+                    }
+                    var issueAnchor = document.getElementById('key-val');
+                    if (issueAnchor && issueAnchor.nodeName == 'A' && issueAnchor.href) {
+                        href = issueAnchor.href;
+                        this.issue = href.substring(href.lastIndexOf('/')+1);
+                    }
+                    if (this.prj && this.issue) {
+                        this.extended = true;
+                        this.error = false;
+                    } else {
+                        if (!this.error) {
+                            this.error = true;
+                            var ctx = this;
+                            setTimeout(function(){
+                                ctx.error = false;
+                            }, 3000);
+                        }
+                    }
+                }
+            },
             keystroke: function(e){
                 if (e.code == 'Enter') {
                     this.subs.push({
@@ -55,6 +91,7 @@
             },
             submit: function() {
                 var len = this.subs.length;
+                var ctx = this;
                 for (var i = 0; i < len; i++) {
                     var isub = this.subs[i];
                     if (isub.stat == 'await' || isub.stat == 'pass') {
@@ -63,6 +100,23 @@
                     (function(){
                         var sub = isub;
                         sub.stat = 'await';
+                        fetch("https://jira.axonivy.com/jira/rest/api/2/issue/", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: ctx._createPayload(sub.name)
+                        })
+                        .then(function(rs){
+                            if (rs.ok) {
+                                sub.stat = "pass";
+                            } else {
+                                sub.stat = "error";
+                            }
+                        })
+                        .catch(function(error){
+                            console.error(error);
+                            sub.stat = "error";
+                        });
+                        /*
                         setTimeout(function() {
                             if (Math.floor(Math.random()*2) == 0) {
                                 sub.stat = "error";
@@ -70,8 +124,14 @@
                                 sub.stat = "pass";
                             }
                         }, Math.random()*5000);
+                        */
                     })();
                 }
+            },
+            _createPayload: function(subName) {
+                return '{"fields":{"project":{"key": "'
+                    +this.prj+'"},"parent":{"key": "'
+                    +this.issue+'"},"summary":"'+subName+'","issuetype":{"id":"8"},"customfield_11200":{"id":"10504"}}}';
             },
             remove: function(index) {
                 this.subs.splice(index, 1);

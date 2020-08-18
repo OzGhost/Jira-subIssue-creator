@@ -23,11 +23,15 @@
         +'      <div class="i-tray">'
         +'          <p class="i-tray-title">Ready sub(s)</p>'
         +'          <p class="i-empty" v-if="subs.length == 0">You are out of sub!</p>'
-        +'          <div class="i-set" v-for="(sub,index) in subs" :key="sub.id">'
-        +'              <input class="s-display" type="text" v-model="sub.name"/>'
-        +'              <span class="bc-btn s-stat" :class="sub.stat"></span>'
-        +'              <span class="bc-btn s-rm" @click="remove(index)">Kill</span>'
-        +'          </div>'
+        +'          <transition-group name="bar" tag="div">'
+        +'              <div class="i-set-shell" v-for="(sub,index) in subs" :key="sub.id">'
+        +'                  <div class="i-set">'
+        +'                      <input class="s-display" type="text" v-model="sub.name"/>'
+        +'                      <span class="bc-btn s-stat" :class="sub.stat"></span>'
+        +'                      <span class="bc-btn s-rm" @click="remove(index)">Kill</span>'
+        +'                  </div>'
+        +'              </div>'
+        +'          </transition-group>'
         +'      </div>'
         +'      <div class="i-ctl">'
         +'          <input class="m-input" type="text" placeholder="Task\'s name" @keydown="keystroke"/>'
@@ -120,15 +124,6 @@
                             console.error(error);
                             sub.stat = "error";
                         });
-                        /*
-                        setTimeout(function() {
-                            if (Math.floor(Math.random()*2) == 0) {
-                                sub.stat = "error";
-                            } else {
-                                sub.stat = "pass";
-                            }
-                        }, Math.random()*5000);
-                        */
                     })();
                 }
             },

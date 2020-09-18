@@ -21,9 +21,10 @@
         +'  <div class="bc-ground" v-if="extended"></div>'
         +'  <div class="bc-screen" v-if="extended">'
         +'      <div class="i-tray">'
-        +'          <p class="i-tray-title">Ready sub(s)</p>'
-        +'          <p class="i-empty" v-if="subs.length == 0">You are out of sub!</p>'
-        +'          <transition-group name="bar" tag="div">'
+        +'          <p class="i-tray-title">Ready sub(s) <button class="kmi" :class="{on: killMode}" @click="onModeSwitch">KILL MODE</button></p>'
+        +'          <p class="i-empty" v-if="!killMode && subs.length == 0">You are out of sub!</p>'
+        +'          <p class="i-empty" v-if="killMode && vics.length == 0">No vic to go!</p>'
+        +'          <transition-group name="bar" tag="div" v-if="!killMode">'
         +'              <div class="i-set-shell" v-for="(sub,index) in subs" :key="sub.id">'
         +'                  <div class="i-set">'
         +'                      <input class="s-display" type="text" v-model="sub.name"/>'
@@ -49,8 +50,10 @@
             extended: false,
             error: false,
             subs: [],
+            vics: [],
             prj: "",
-            issue: ""
+            issue: "",
+            killMode: false
         },
         methods: {
             trigger: function(){
@@ -134,6 +137,9 @@
             },
             remove: function(index) {
                 this.subs.splice(index, 1);
+            },
+            onModeSwitch: function() {
+                this.killMode = !this.killMode;
             }
         }
     });

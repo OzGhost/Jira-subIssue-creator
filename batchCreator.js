@@ -33,6 +33,13 @@
         +'                  </div>'
         +'              </div>'
         +'          </transition-group>'
+        +'          <transition-group name="bar" tag="div" v-else>'
+        +'              <div class="i-set-shell" v-for="(vic,index) in vics" :key="vic.id">'
+        +'                  <div class="i-set" @click="killvic(vic)">'
+        +'                      <p><span>{{ vic.id }}</span> -- {{ vic.name }} -- {{ vic.stat }}</p>'
+        +'                  </div>'
+        +'              </div>'
+        +'          </transition-group>'
         +'      </div>'
         +'      <div class="i-ctl">'
         +'          <input class="m-input" type="text" placeholder="Task\'s name" @keydown="keystroke"/>'
@@ -140,6 +147,51 @@
             },
             onModeSwitch: function() {
                 this.killMode = !this.killMode;
+                if (this.killMode) {
+                    this.vics = [];
+                    var ctx = this;
+                    fetch("https://jira.axonivy.com/jira/rest/api/2/issue/"+this.issue+"?fields=subtasks")
+                        .then(function(rs) {
+                            if (rs.ok) {
+                                return rs.json();
+                            } else {
+                                console.error("rs.!ok");
+                            }
+                        })
+                        .then(function(data){
+                            ctx.vics = data.fields.subtasks.map(function(vic){
+                                return {
+                                    id: vic.key,
+                                    name: vic.fields.summary,
+                                    stat: '-' // busy | fail
+                                };
+                            });
+                        })
+                        .catch(function(er){
+                            console.error(er);
+                        });
+                }
+            },
+            killvic: function(vic) {
+                if (vic.stat == 'busy') {
+                    return;
+                }
+                vic.stat = 'busy';
+                var ctx = this;
+                fetch("https://jira.axonivy.com/jira/rest/api/2/issue/"+vic.id, { method: "DELETE" })
+                    .then(function(rs){
+                        if (rs.ok) {
+                            ctx.vics = ctx.vics.filter(function(v){
+                                return v.id != vic.id;
+                            });
+                        } else {
+                            vic.stat = 'fail';
+                        }
+                    })
+                    .catch(function(e){
+                        console.log(e);
+                        vic.stat = 'fail';
+                    });
             }
         }
     });

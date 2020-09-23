@@ -327,3 +327,20 @@
     box-shadow: none;
 }
 
+.vic {
+    width: 100%;
+    border-bottom: 1px dashed #a6a6a4;
+}
+.vic:hover {
+    box-shadow: 0px 0px 3px #ff414d inset;
+}
+.vic__id {
+    padding: 0 4px;
+    margin-right: 4px;
+    text-decoration: underline;
+}
+.vic .s-stat {
+    float: right;
+    height: 32px;
+}
+

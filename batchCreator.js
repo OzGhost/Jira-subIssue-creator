@@ -36,12 +36,16 @@
         +'          <transition-group name="bar" tag="div" v-else>'
         +'              <div class="i-set-shell" v-for="(vic,index) in vics" :key="vic.id">'
         +'                  <div class="i-set" @click="killvic(vic)">'
-        +'                      <p><span>{{ vic.id }}</span> -- {{ vic.name }} -- {{ vic.stat }}</p>'
+        +'                      <p class="vic">'
+        +'                          <span class="vic__id">{{ vic.id }}</span>'
+        +'                          {{ vic.name }}'
+        +'                          <span class="s-stat" :class="vic.stat"></span>'
+        +'                      </p>'
         +'                  </div>'
         +'              </div>'
         +'          </transition-group>'
         +'      </div>'
-        +'      <div class="i-ctl">'
+        +'      <div class="i-ctl" v-if="!killMode">'
         +'          <input class="m-input" type="text" placeholder="Task\'s name" @keydown="keystroke"/>'
         +'          <button class="bc-btn m-close" @click="extended = false">Close</button>'
         +'          <button class="bc-btn m-dismiss" @click="dismiss">Dismiss</button>'
@@ -163,7 +167,7 @@
                                 return {
                                     id: vic.key,
                                     name: vic.fields.summary,
-                                    stat: '-' // busy | fail
+                                    stat: 'still' // still | await | error
                                 };
                             });
                         })
@@ -173,10 +177,10 @@
                 }
             },
             killvic: function(vic) {
-                if (vic.stat == 'busy') {
+                if (vic.stat == 'await') {
                     return;
                 }
-                vic.stat = 'busy';
+                vic.stat = 'await';
                 var ctx = this;
                 fetch("https://jira.axonivy.com/jira/rest/api/2/issue/"+vic.id, { method: "DELETE" })
                     .then(function(rs){
@@ -185,12 +189,12 @@
                                 return v.id != vic.id;
                             });
                         } else {
-                            vic.stat = 'fail';
+                            vic.stat = 'error';
                         }
                     })
                     .catch(function(e){
                         console.log(e);
-                        vic.stat = 'fail';
+                        vic.stat = 'error';
                     });
             }
         }

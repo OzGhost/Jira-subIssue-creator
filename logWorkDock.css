@@ -10,6 +10,7 @@
 
 .lwd-dock .line {
     margin: 8px 4px;
+    position: relative;
 }
 
 .lwd-dock textarea,
@@ -36,4 +37,34 @@
     top: -8px;
     transform: rotate(45deg);
     background: #19171c;
+}
+
+.lwd-dock .dive {
+    position: absolute;
+    background: #8b8792;
+    color: #19171c;
+    display: inline-block;
+    padding: 2px 8px;
+    box-sizing: border-box;
+    right: 0px;
+    bottom: 1px;
+}
+
+.lwd-dock button {
+    display: block;
+    border: 0;
+    margin: 16px 0 0 0;
+    padding: 4px 8px;
+    background: #8b8792;
+    color: #19171c;
+    box-sizing: border-box;
+    width: 100%;
+    cursor: pointer
+}
+
+.lwd-dock button.green {
+    background: #2a9292;
+}
+.lwd-dock button.red {
+    background: #be4678;
 }

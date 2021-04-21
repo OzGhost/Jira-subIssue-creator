@@ -30,5 +30,6 @@ A chrome extension to create sub-issue automatically for every story in a specif
 ### Log work balloon keystrokes
 - __Double Ctrl__: (aka press control key twice real fast) open the balloon for running task *UNDER THE POINTER*.
 - Keep in mind that the balloon will NOT open if another one is opening somewhere else so close them all then try again
+- Another gotcha is that keystroke work on the current window. If the cursor is focus in some kind of input within current window then it may not hit at all
 - __Esc__: close the balloon
 

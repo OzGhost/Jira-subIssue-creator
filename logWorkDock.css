@@ -1,5 +1,39 @@
 .lwd-dock {
     width: 100%;
-    height: 100px;
-    border: 1px solid red;
+    background: #19171c;
+    color: #8b8792;
+    padding: 2px 4px;
+    margin-top: 12px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.lwd-dock .line {
+    margin: 8px 4px;
+}
+
+.lwd-dock textarea,
+.lwd-dock input {
+    background: #19171c;
+    border: 1px solid #8b8792;
+    padding: 4px 8px;
+    display: block;
+    color: #8b8792;
+    width: 100%;
+    box-sizing: border-box;
+    outline-color: transparent !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+}
+
+.lwd-dock .ear {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 0;
+    margin: 0;
+    left: 25px;
+    top: -8px;
+    transform: rotate(45deg);
+    background: #19171c;
 }

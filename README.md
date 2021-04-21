@@ -27,3 +27,7 @@ A chrome extension to create sub-issue automatically for every story in a specif
 - __Ctrl + Shift + F__: mount the trigger
 - __Ctrl + Shift + E__: open configuration dashboard
 
+### Log work balloon keystrokes
+- __Double Ctrl__: (aka press controll twice real fast) open the balloon for running task *UNDER THE POINTER* keep in mind that the balloon will NOT open if another one is opening somewhere else so try to close the other and try again
+- __Esc__: close the balloon
+

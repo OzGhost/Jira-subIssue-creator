@@ -27,6 +27,9 @@
         }
         return ''+val;
     }
+    function getTz(ds) {
+        return (''+ds).replace(/^.*([+-]\d+)$/, '$1');
+    }
     function currentTz() {
         var tz = new Date().getTimezoneOffset();
         var sign = tz <= 0 ? '+' : '-';
@@ -35,8 +38,8 @@
         var mg = toDisplay(tz%60);
         return sign + hg +  mg;
     }
-    function t2d(d) {
-        var dobj = new Date(d);
+    function t2d() {
+        var dobj = new Date();
         var inMil = dobj.getTime() - dobj.getTimezoneOffset()*60000;
         return new Date(inMil).toISOString().substring(0,19);
     }
@@ -79,13 +82,16 @@
             },
             mounted: function(){
                 var _this = this;
-                this.tz = currentTz();
-                function loadBeginAt(rs) {
-                    _this.beginAt = t2d(rs.fields.updated);
+                function loadBeginAt() {
+                    _this.tz = currentTz();
+                    _this.beginAt = t2d();
                 }
+                loadBeginAt();
+                /*
                 fetch("https://jira.axonivy.com/jira/rest/api/2/issue/"+key+"?fields=updated")
                     .then(function(rs){ return rs.json(); })
                     .then(loadBeginAt)
+                    */
             },
             methods: {
                 go: function() {
@@ -128,7 +134,7 @@
                 setUpDock();
             } else {
                 ready = true;
-                tid = setTimeout(function(){ ready = false; }, 200);
+                tid = setTimeout(function(){ ready = false; }, 500);
             }
         }
     });

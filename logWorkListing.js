@@ -122,6 +122,7 @@
             mount();
         } else if (ev.key == "Escape" && ground) {
             document.body.removeChild(ground);
+            ground = undefined;
             console.log("__[o0] release!");
         }
     });

@@ -90,6 +90,7 @@
     color: #ddd;
     overflow-y: auto;
     font-family: 'Anonymous Pro', monospace;
+    box-shadow: 0 0 12px #eee;
 }
 .lwl-frame h1 {
     color: #ddd;

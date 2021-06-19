@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Anonymous+Pro&display=swap');
+.lwl-lever {
+    display: inline-block;
+    margin: 0 10px;
+    border: 0;
+    position: relative;
+    height: 1em;
+    width: 1em;
+    cursor: pointer;
+}
+.lwl-lever::before {
+    content: "";
+    position: absolute;
+    transform: rotate(45deg);
+    height: 1em;
+    width: 1em;
+    background: #c8f4f9;
+}
+.lwl-lever::after {
+    content: "";
+    position: absolute;
+    transform: rotate(45deg);
+    display: inline-block;
+    height: 0.5em;
+    width: 0.5em;
+    background: #3cacae;
+    bottom: -0.03em;
+    right: -0.2em;
+}
+.lwl-ground {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #00000099;
+    z-index: 1000;
+}
+.lwl-gears {
+    position: absolute;
+    top: calc(50% - 3em);
+    left: calc(50% - 3em);
+    width: 7em;
+    height: 7em;
+}
+.lwl-gears::before {
+    content: "";
+    position: absolute;
+    display: inline-block;
+    width: 6em;
+    height: 6em;
+    border: solid 1px white;
+    box-shadow: 0 0 8px white, 0 0 8px white inset;
+    transform: rotate(45deg);
+    top: 0;
+    left: 0;
+    animation: lwl-spin-back linear 1.7s infinite;
+}
+.lwl-gears::after {
+    content: "";
+    position: absolute;
+    display: inline-block;
+    width: 3em;
+    height: 3em;
+    border: solid 2px white;
+    box-shadow: 0 0 4px white, 0 0 4px white inset;
+    transform: rotate(45deg);
+    top: 3.5em;
+    left: 4.5em;
+    animation: lwl-spin linear .79s infinite;
+}
+@keyframes lwl-spin {
+    from { transform: rotate(45deg) }
+    to { transform: rotate(405deg) }
+}
+@keyframes lwl-spin-back {
+    from { transform: rotate(405deg) }
+    to { transform: rotate(45deg) }
+}
+.lwl-frame {
+    position: fixed;
+    right: 0;
+    top: 15%;
+    width: 60%;
+    max-height: 70%;
+    min-height: 45%;
+    background: #000;
+    border-radius: 8px 0 0 8px;
+    padding: 8px 16px;
+    color: #ddd;
+    overflow-y: auto;
+    font-family: 'Anonymous Pro', monospace;
+}
+.lwl-frame h1 {
+    color: #ddd;
+    padding-top: 20px;
+}
+.lwl-clusters,
+.lwl-clusters ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 12px;
+    font-size: 14px;
+}
+.lwl-clusters li {
+    position: relative;
+}
+.lwl-clusters > li {
+    margin-top: 20px;
+}
+.lwl-clusters li::before {
+    content: "+";
+    position: absolute;
+    top: 0;
+    left: -16px;
+}
+.lwl-cluster > * {
+    float: left;
+    box-sizing: border-box;
+}
+.lwl-cluster::after {
+    content: "";
+    display: block;
+    height: 0;
+    clear: both;
+}
+.lwl-cluster p {
+    margin: 0;
+}
+.lwl-cluster > div > p {
+    font-size: 18px;
+    text-align: center;
+}
+.lwl-cluster > div > p:nth-child(2) {
+    font-weight: bold;
+    padding-top: 10px;
+}
+.lwl-cluster > div {
+    width: 20%;
+}
+.lwl-cluster > ul {
+    width: 80%;
+    padding-left: 30px;
+    margin-top: 24px;
+}
+.lwl-cluster > ul > li {
+    padding: 2px;
+}
+.lwl-cluster > ul > li > p {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

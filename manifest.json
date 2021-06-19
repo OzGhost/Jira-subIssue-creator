@@ -9,13 +9,13 @@
             "css": [
                 "jsc.css",
                 "batchStyle.css",
-                "logWorkDock.css"
+                "logWorkListing.css"
             ],
             "js": [
                 "jsc.js",
                 "vue.js",
                 "batchCreator.js",
-                "logWorkDock.js"
+                "logWorkListing.js"
             ],
             "run_at": "document_end"
         }

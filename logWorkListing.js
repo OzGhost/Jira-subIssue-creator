@@ -15,8 +15,77 @@
     console.log("__[o0] ready");
     var ground = undefined;
     var logs = undefined;
+    var msgs = undefined;
+    function printMsgs() {
+        return msgs.join("\n");
+    };
+    function toSeconds(d){
+        var lastIdx = d.length - 1;
+        var unit = d.charAt(lastIdx);
+        var scale = 60;
+        switch(unit) {
+            case "h":
+                scale = 3600;
+            case "m":
+                return scale * d.substring(0, lastIdx);
+            default:
+                return 3600 * d;
+        }
+    };
+    function toLog(sid) {
+        return function(sub) {
+            var desc = sub.fields.description;
+            var comment = sub.fields.summary;
+            var barrierIdx = desc.toUpperCase().indexOf("PARTICIPANT");
+            var timep = "";
+            if (barrierIdx < 0) {
+                timep = desc;
+            } else {
+                if (desc.indexOf("[~" + uid + "]") == -1) {
+                    msgs.push("__[o0] Absent during: " + sid + " | " + comment);
+                    return;
+                }
+                timep = desc.substring(0, barrierIdx);
+            }
+            barrierIdx = timep.indexOf(":");
+            if (timep.length < 12 || barrierIdx < 10) {
+                msgs.push("__[o0] Unsufficient timep <" + timep + ">: " + sid + " | " + comment);
+                return;
+            }
+            var duration = timep.substring(barrierIdx+1, timep.length).trim();
+            if ( ! /^\d+(?:\.\d+)?[hm]?$/.test(duration)) {
+                msgs.push("__[o0] Unsufficient duration in <" + timep + ">: " + sid + " | " + comment);
+                return;
+            }
+            logs.push({
+                time: timep.substring(0, barrierIdx).trim(),
+                duration: toSeconds(duration),
+                last: duration,
+                comment: comment,
+                sid: sid
+            });
+        };
+    };
+    function toJson(rs) { return rs.json() };
+    function picks(sid) {
+        return function(subs) {
+            var subps = [];
+            for (var i = 0; i < subs.length; i++) {
+                var sub = subs[i];
+                var comment = (sub.fields.summary + "").trim();
+                if ( ! comment.startsWith("[Meeting]") && ! comment.startsWith("[Code review]")) continue;
+                var stat = sub.fields.status.name;
+                if (stat != "Resolved") continue;
+                var ps = fetch(sub.self + "?fields=description,summary")
+                        .then(toJson)
+                        .then(toLog(sid));
+                subps.push(ps);
+            }
+            return Promise.all(subps);
+        };
+    };
     function formatDuration(d) {
-        return d / 3600 + 'h';
+        return ( + (d / 3600).toFixed(3)) + 'h';
     };
     function toCid(timestring) {
         return timestring.substring(0, 10);
@@ -57,12 +126,18 @@
                     +'</li>';
             output += ccontent;
         }
-        output = '<div class="lwl-frame"><h1>- Total: ' + formatDuration(stotal) + ' -</h1><ul class="lwl-clusters">' + output +  '</ul></div>';
+        output = '<div class="lwl-frame"><h1>- Total: '
+                + formatDuration(stotal)
+                + ' -</h1><pre>'
+                + printMsgs()
+                + '</pre><ul class="lwl-clusters">'
+                + output
+                +  '</ul></div>';
         ground.innerHTML = output;
     };
     function prune(sid) {
         return function(rs) {
-            var records = rs.fields.worklog.worklogs;
+            var records = rs.worklogs;
             for (var i = 0; i < records.length; i++) {
                 var r = records[i];
                 if (r.author.key != uid) {
@@ -84,18 +159,26 @@
         ground.innerHTML = "<span class='lwl-gears'></span>";
         document.body.appendChild(ground);
         logs = [];
+        msgs = [];
 
         var frame = el.parentNode.parentNode.parentNode;
         var idHolders = frame.querySelectorAll("a[href^='/jira/browse']");
-        console.log("__[o0] id holder count: ", idHolders.length);
+        msgs.push("__[o0] # story found: " + idHolders.length);
         var i = 0;
         var id = undefined;
         var idps = [];
         for (; i < idHolders.length; i++) {
-            id = idHolders[i].getAttribute("title");
-            idps[i] = fetch("https://jira.axonivy.com/jira/rest/api/2/issue/"+id+"?fields=worklog")
-                        .then(function(rs){ return rs.json(); })
-                        .then(prune(id));
+            (function(){
+                id = idHolders[i].getAttribute("title");
+                var worklogUrl = "https://jira.axonivy.com/jira/rest/api/2/issue/"+id+"/worklog";
+                var subsUrl = "https://jira.axonivy.com/jira/rest/api/2/issue/"+id+"/subtask"; 
+                idps[i] = fetch(worklogUrl)
+                            .then(toJson)
+                            .then(prune(id))
+                            .then(function(){ return fetch(subsUrl); })
+                            .then(toJson)
+                            .then(picks(id));
+                })();
         }
         Promise.all(idps).then(renderLogs);
     };

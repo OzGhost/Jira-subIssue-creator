@@ -95,6 +95,9 @@
     color: #ddd;
     padding-top: 20px;
 }
+.lwl-frame pre {
+    font-size: 11px;
+}
 .lwl-clusters,
 .lwl-clusters ul {
     list-style: none;

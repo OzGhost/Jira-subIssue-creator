@@ -1,18 +1,5 @@
 (function(){
     var uid = "nhduc";
-    var qry = window.location.search;
-    var args = {};
-    if (qry.length) {
-        qry = qry.substring(1).split('&');
-        for (var i = 0; i < qry.length; i++) {
-            args[qry[i]] = true;
-        }
-    }
-    if (!args["rapidView=85"] || !args["view=planning.nodetail"]) {
-        console.log("__[o0] NOT the page");
-        return;
-    }
-    console.log("__[o0] ready");
     var ground = undefined;
     var logs = undefined;
     var msgs = undefined;
@@ -190,8 +177,9 @@
         var clever = undefined;
         for (i = 0; i < sprints.length; i++) {
             sprint = sprints[i];
-            clever = document.createElement("span");
+            clever = document.createElement("a");
             clever.className = "lwl-lever";
+            clever.href = "#";
             clever.addEventListener("click", function(ev){
                 ev.preventDefault();
                 ev.stopPropagation();
@@ -202,6 +190,19 @@
     };
     document.body.addEventListener("keydown", function(ev){
         if (ev.ctrlKey && ev.shiftKey && ev.key == "L") {
+            var qry = window.location.search;
+            var args = {};
+            if (qry.length) {
+                qry = qry.substring(1).split('&');
+                for (var i = 0; i < qry.length; i++) {
+                    args[qry[i]] = true;
+                }
+            }
+            if (!args["rapidView=85"] || !args["view=planning.nodetail"]) {
+                console.log("__[o0] NOT the page");
+                return;
+            }
+            console.log("__[o0] ready");
             mount();
         } else if (ev.key == "Escape" && ground) {
             document.body.removeChild(ground);

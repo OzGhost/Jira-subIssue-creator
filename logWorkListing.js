@@ -25,29 +25,21 @@
             var comment = sub.fields.summary;
             var barrierIdx = desc.toUpperCase().indexOf("PARTICIPANT");
             var timep = "";
-            if (barrierIdx < 0) {
-                timep = desc;
-            } else {
+            if (barrierIdx >= 0) {
                 if (desc.indexOf("[~" + uid + "]") == -1) {
                     msgs.push("__[o0] Absent during: " + sid + " | " + comment);
                     return;
                 }
-                timep = desc.substring(0, barrierIdx);
             }
-            barrierIdx = timep.indexOf(":");
-            if (timep.length < 12 || barrierIdx < 10) {
-                msgs.push("__[o0] Unsufficient timep <" + timep + ">: " + sid + " | " + comment);
-                return;
-            }
-            var duration = timep.substring(barrierIdx+1, timep.length).trim();
-            if ( ! /^\d+(?:\.\d+)?[hm]?$/.test(duration)) {
-                msgs.push("__[o0] Unsufficient duration in <" + timep + ">: " + sid + " | " + comment);
+            var matched = desc.match(/(\d{4}-\d\d-\d\d):\s*(\d+(?:\.\d+)?[mh]?)/);
+            if ( ! matched) {
+                msgs.push("__[o0] no time found: " + sid + " | " + comment);
                 return;
             }
             logs.push({
-                time: timep.substring(0, barrierIdx).trim(),
-                duration: toSeconds(duration),
-                last: duration,
+                time: matched[1],
+                duration: toSeconds(matched[2]),
+                last: matched[2],
                 comment: comment,
                 sid: sid
             });

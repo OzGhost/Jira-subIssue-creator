@@ -195,7 +195,7 @@
                 return;
             }
             console.log("__[o0] ready");
-            mount();
+            //mount();
         } else if (ev.key == "Escape" && ground) {
             document.body.removeChild(ground);
             ground = undefined;

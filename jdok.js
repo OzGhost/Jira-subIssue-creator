@@ -1,39 +1,49 @@
 (function(){
-    document.body.addEventListener('keydown', function(ev){
-        if (ev.ctrlKey && ev.shiftKey && ev.key == "L") {
-            console.log("__[o0] matched");
-            mount();
-        }
-        if (ev.key == "Escape" && ground) {
-        }
-    });
     var dok = undefined;
     var bar = undefined
+    document.body.addEventListener('keydown', function(ev){
+        if (ev.ctrlKey && ev.shiftKey && ev.key == "L") {
+            mount();
+            return;
+        }
+        if ( ! dok) {
+            return;
+        }
+        console.log("__[o0] encounter:", ev.key);
+        switch (ev.key) {
+            case "Escape":
+                console.log("__[o0] dedocking ...");
+                return umount();
+            case "w":
+                console.log("__[o0] open lwl ...");
+                return window.lwl && window.lwl();
+        }
+    });
     function mount() {
-        /**
-                <a href="#" title="B(u)lk"><img src="icons/poison_v2.png"/></a>
-                <a href="#" title="Cre(a)tor"><img src="icons/water-pollution.png"/></a>
-                <a href="#" title="Lw(l)"><img src="icons/smoking.png"/></a>
-                <a href="#" title="Cf(g)"><img src="icons/dangerous.png"/></a>
-        */
+        if (dok) {
+            console.log("__[o0] docked !!!");
+            return;
+        }
+        console.log("__[o0] docking ...");
         bar = document.createElement("div");
         bar.className = "jbar";
-        bar.appendChild( createAnchor("B(u)lk", "poison_v2.png") );
+        bar.appendChild( createAnchor("(B)ulk", "poison_v2.png") );
         bar.appendChild( createAnchor("Cre(a)tor", "water-pollution.png") );
-        bar.appendChild( createAnchor("Lw(l)", "smoking.png") );
-        bar.appendChild( createAnchor("C(f)g", "dangerous.png") );
+        bar.appendChild( createAnchor("L(w)l", "smoking.png", function(){ window.lwl && window.lwl(); }) );
+        bar.appendChild( createAnchor("(C)fg", "dangerous.png") );
         dok = document.createElement("div");
         dok.className = "jdok";
         dok.appendChild(bar);
         document.body.appendChild(dok);
     };
-    function createAnchor(title, icon) {
+    function createAnchor(title, icon, func) {
         var anchor = document.createElement("a");
         anchor.href = "/"+title;
         anchor.title = title;
         anchor.innerHTML = '<img src="https://github.com/OzGhost/Jira-subIssue-creator/raw/master/icons/'+icon+'"/>';
         anchor.addEventListener("click", function(ev){
             ev.preventDefault();
+            func && func();
         });
         return anchor;
     };

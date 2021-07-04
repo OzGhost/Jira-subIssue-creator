@@ -113,6 +113,17 @@
                 + output
                 +  '</ul></div>';
         ground.innerHTML = output;
+        var goner = document.createElement("a");
+        goner.innerHTML = "&times;";
+        goner.href = "/dismiss";
+        goner.className = "lwl-goner";
+        goner.addEventListener("click", function(ev) {
+            ev.preventDefault();
+            document.body.removeChild(ground);
+            ground = undefined;
+            console.log("__[o0] dismiss lwl ...");
+        });
+        ground.childNodes[0].appendChild(goner);
     };
     function prune(sid) {
         return function(rs) {
@@ -180,26 +191,19 @@
             sprint.appendChild(clever);
         }
     };
-    document.body.addEventListener("keydown", function(ev){
-        if (ev.ctrlKey && ev.shiftKey && ev.key == "L") {
-            var qry = window.location.search;
-            var args = {};
-            if (qry.length) {
-                qry = qry.substring(1).split('&');
-                for (var i = 0; i < qry.length; i++) {
-                    args[qry[i]] = true;
-                }
+    window.lwl = function() {
+        var qry = window.location.search;
+        var args = {};
+        if (qry.length) {
+            qry = qry.substring(1).split('&');
+            for (var i = 0; i < qry.length; i++) {
+                args[qry[i]] = true;
             }
-            if (!args["rapidView=85"] || !args["view=planning.nodetail"]) {
-                console.log("__[o0] NOT the page");
-                return;
-            }
-            console.log("__[o0] ready");
-            //mount();
-        } else if (ev.key == "Escape" && ground) {
-            document.body.removeChild(ground);
-            ground = undefined;
-            console.log("__[o0] release!");
         }
-    });
+        if (!args["rapidView=85"] || !args["view=planning.nodetail"]) {
+            console.log("__[o0] NOT the page");
+            return;
+        }
+        mount();
+    };
 })();

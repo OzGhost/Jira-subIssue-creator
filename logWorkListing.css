@@ -155,3 +155,17 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+.lwl-goner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 30px;
+    color: #eee;
+    background: crimson;
+    display: block;
+    height: 30px;
+}
+.lwl-goner:hover {
+    color: #eee;
+    text-decoration: none;
+}

@@ -17,7 +17,8 @@
                 "vue.js",
                 "batchCreator.js",
                 "logWorkListing.js",
-                "jdok.js"
+                "jdok.js",
+                "icstore.js"
             ],
             "run_at": "document_end"
         }

@@ -27,10 +27,10 @@
         console.log("__[o0] docking ...");
         bar = document.createElement("div");
         bar.className = "jbar";
-        bar.appendChild( createAnchor("(B)ulk", "poison_v2.png") );
-        bar.appendChild( createAnchor("Cre(a)tor", "water-pollution.png") );
-        bar.appendChild( createAnchor("L(w)l", "smoking.png", function(){ window.lwl && window.lwl(); }) );
-        bar.appendChild( createAnchor("(C)fg", "dangerous.png") );
+        bar.appendChild( createAnchor("(B)ulk", "poison_v2") );
+        bar.appendChild( createAnchor("Cre(a)tor", "water-pollution") );
+        bar.appendChild( createAnchor("L(w)l", "smoking", function(){ window.lwl && window.lwl(); }) );
+        bar.appendChild( createAnchor("(C)fg", "dangerous") );
         dok = document.createElement("div");
         dok.className = "jdok";
         dok.appendChild(bar);
@@ -40,7 +40,9 @@
         var anchor = document.createElement("a");
         anchor.href = "/"+title;
         anchor.title = title;
-        anchor.innerHTML = '<img src="https://github.com/OzGhost/Jira-subIssue-creator/raw/master/icons/'+icon+'"/>';
+        var img = document.createElement('img');
+        img.src = window.icstore(icon);
+        anchor.append(img);
         anchor.addEventListener("click", function(ev){
             ev.preventDefault();
             func && func();

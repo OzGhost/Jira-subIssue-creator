@@ -3,6 +3,8 @@
     var ground = undefined;
     var logs = undefined;
     var msgs = undefined;
+    var ss = undefined;
+    var as = undefined;
     function printMsgs() {
         return msgs.join("\n");
     };
@@ -143,6 +145,24 @@
             }
         };
     };
+    function listAll(ids) {
+        var i = 0;
+        var idps = [];
+        for (var i = 0; i < ids.length; i++) {
+            (function(){
+                var id = ids[i];
+                var worklogUrl = "https://jira.axonivy.com/jira/rest/api/2/issue/"+id+"/worklog";
+                var subsUrl = "https://jira.axonivy.com/jira/rest/api/2/issue/"+id+"/subtask"; 
+                idps[i] = fetch(worklogUrl)
+                            .then(toJson)
+                            .then(prune(id))
+                            .then(function(){ return fetch(subsUrl); })
+                            .then(toJson)
+                            .then(picks(id));
+            })();
+        }
+        Promise.all(idps).then(renderLogs, function(err){ console.log("__[xx] crashed: ", err); });
+    };
     function list(el) {
         ground = document.createElement("div");
         ground.className = "lwl-ground";
@@ -154,23 +174,11 @@
         var frame = el.parentNode.parentNode.parentNode;
         var idHolders = frame.querySelectorAll("a[href^='/jira/browse']");
         msgs.push("__[o0] # story found: " + idHolders.length);
-        var i = 0;
-        var id = undefined;
-        var idps = [];
-        for (; i < idHolders.length; i++) {
-            (function(){
-                id = idHolders[i].getAttribute("title");
-                var worklogUrl = "https://jira.axonivy.com/jira/rest/api/2/issue/"+id+"/worklog";
-                var subsUrl = "https://jira.axonivy.com/jira/rest/api/2/issue/"+id+"/subtask"; 
-                idps[i] = fetch(worklogUrl)
-                            .then(toJson)
-                            .then(prune(id))
-                            .then(function(){ return fetch(subsUrl); })
-                            .then(toJson)
-                            .then(picks(id));
-                })();
+        var ids = [];
+        for (var i = 0; i < idHolders.length; i++) {
+            ids.push( idHolders[i].getAttribute("title") );
         }
-        Promise.all(idps).then(renderLogs);
+        listAll(ids);
     };
     function mount() {
         var sprints = document.body.querySelectorAll("div.ghx-name");
@@ -205,5 +213,30 @@
             return;
         }
         mount();
+        (function(){
+            ss = [];
+            function next(rs) {
+                console.log("__[o0] next ...");
+                var url = "https://jira.axonivy.com/jira/rest/agile/1.0/board/85/sprint?startAt=";
+                if (rs) {
+                    url += (rs.maxResults + rs.startAt);
+                    for (var i = 0; i < rs.values.length; i++) {
+                        var item = rs.values[i];
+                        ss.push({id: item.id, name: item.name});
+                        if (item.state == 'active') {
+                            as = {id: item.id, name: item.name};
+                        }
+                    }
+                    if (rs.isLast) {
+                        console.log("__[o0] as: ",as);
+                        return;
+                    }
+                } else {
+                    url += 130;
+                }
+                fetch(url).then(toJson).then(next);
+            };
+            next();
+        })();
     };
 })();

@@ -1,10 +1,13 @@
 (function(){
+    "use strict";
     var uid = "nhduc";
     var ground = undefined;
     var logs = undefined;
     var msgs = undefined;
     var ss = undefined;
     var as = undefined;
+    var ps = undefined;
+    var hook = undefined;
     function printMsgs() {
         return msgs.join("\n");
     };
@@ -208,35 +211,106 @@
                 args[qry[i]] = true;
             }
         }
-        if (!args["rapidView=85"] || !args["view=planning.nodetail"]) {
-            console.log("__[o0] NOT the page");
-            return;
+        if (args["rapidView=85"] && args["view=planning.nodetail"]) {
+            mount();
         }
-        mount();
         (function(){
+            if (ss) {
+                createHook();
+                return;
+            }
             ss = [];
             function next(rs) {
-                console.log("__[o0] next ...");
                 var url = "https://jira.axonivy.com/jira/rest/agile/1.0/board/85/sprint?startAt=";
                 if (rs) {
+                    console.log("__[o0] next ...");
                     url += (rs.maxResults + rs.startAt);
                     for (var i = 0; i < rs.values.length; i++) {
                         var item = rs.values[i];
-                        ss.push({id: item.id, name: item.name});
+                        ss.unshift({id: item.id, name: item.name});
                         if (item.state == 'active') {
                             as = {id: item.id, name: item.name};
+                            ps = as;
                         }
                     }
                     if (rs.isLast) {
-                        console.log("__[o0] as: ",as);
+                        createHook();
                         return;
                     }
                 } else {
-                    url += 130;
+                    url += 140;
                 }
-                fetch(url).then(toJson).then(next);
+                fetch(url).then(toJson).then(next, function(){ console.error("__[xx]"); });
             };
             next();
         })();
+    };
+    function createHook() {
+        if (hook) return;
+        var opening = false;
+        var h = document.createElement("div");
+        hook = h;
+        var ali = undefined;
+        var u = document.createElement("ul");
+        var p = document.createElement("a");
+        p.href = "/pick";
+        p.className = "selection";
+        p.innerText = (as && as.name) || "Pick a sprint, please!";
+        p.addEventListener("click", function(ev){
+            ev.preventDefault();
+            opening = !opening;
+            u.className = opening ? "open" : "";
+        });
+        for (var j = 0; j < ss.length; j++) {
+            (function(){
+                var ci = ss[j];
+                var li = document.createElement("li");
+                li.innerText = ci.name;
+                if (ci.id == as.id) {
+                    li.className = "light";
+                    ali = li;
+                }
+                li.addEventListener("click", function(ev) {
+                    if (ali) {
+                        ali.className = "";
+                    }
+                    ali = ev.target;
+                    ali.className = "light";
+                    ps = ci;
+                    p.innerText = ci.name;
+                    u.className = "";
+                    opening = false;
+                });
+                u.appendChild(li);
+            })();
+        }
+        var g = document.createElement("a");
+        g.href = "/go";
+        g.className = "action";
+        g.innerText = "Go";
+        g.addEventListener("click", function(ev){
+            ev.preventDefault();
+            opening = false;
+            u.className = "";
+            console.log("__[o0] go with", ps);
+        });
+        var d = document.createElement("a");
+        d.href = "/dismiss";
+        d.innerHTML = "&times;";
+        d.addEventListener("click", function(ev){
+            ev.preventDefault();
+            document.body.removeChild(h);
+            hook = undefined;
+        });
+        var i = document.createElement("input");
+        i.id = "lwl-hook-picker";
+        i.type = "checkbox";
+
+        h.className = "lwl-hook";
+        h.appendChild(p);
+        h.appendChild(g);
+        h.appendChild(d);
+        h.appendChild(u);
+        document.body.appendChild(h);
     };
 })();

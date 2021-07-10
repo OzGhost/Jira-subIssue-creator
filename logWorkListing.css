@@ -169,3 +169,66 @@
     color: #eee;
     text-decoration: none;
 }
+.lwl-hook {
+    font-family: 'Anonymous Pro', monospace;
+    position: fixed;
+    left: 0;
+    top: 150px;
+    padding: 10px 10px 10px 60px;
+    background: black;
+    color: #ccc;
+    font-size: 16px;
+    z-index: 1000;
+}
+.lwl-hook a {
+    display: inline-block;
+    padding: 5px 10px 0px 10px;
+    line-height: 36px;
+    border: 1px solid #ccc;
+    text-decoration: none;
+    color: #ccc;
+    float: left;
+    box-shadow: none !important;
+}
+.lwl-hook a:hover,
+.lwl-hook a:focus,
+.lwl-hook a:active {
+    text-decoration: none;
+    color: #ccc;
+}
+.lwl-hook a.selection {
+    border: 1px solid #ccc;
+    padding: 5px 16px 0px 16px;
+    display: inline-block;
+    cursor: pointer;
+}
+.lwl-hook a.action {
+    color: black;
+    background: #ccc;
+}
+.lwl-hook ul {
+    position: absolute;
+    top: 100%;
+    left: 60px;
+    background: black;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 320px;
+    overflow-y: auto;
+    display: none;
+}
+.lwl-hook ul.open {
+    display: block;
+}
+.lwl-hook li {
+    padding: 5px 16px 0px 16px;
+    border-left: 1px dotted #ccc;
+    margin: 4px 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    line-height: 36px;
+}
+.lwl-hook li.light {
+    border: 1px dashed #ccc;
+}

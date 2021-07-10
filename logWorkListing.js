@@ -251,6 +251,7 @@
     function createHook() {
         if (hook) return;
         var opening = false;
+        ps = as;
         var h = document.createElement("div");
         hook = h;
         var ali = undefined;
@@ -317,8 +318,9 @@
         document.body.appendChild(h);
     };
     function fetchPickedSprint() {
-        prepareGround();
         console.log("__[o0] ps: ", ps);
+        if ( ! ps) return;
+        prepareGround();
         var url = "https://jira.axonivy.com/jira/rest/agile/1.0/sprint/"+ps.id+"/issue?fields=issuetype";
         var total = 0;
         var count = 0;
@@ -352,3 +354,4 @@
         });
     }
 })();
+

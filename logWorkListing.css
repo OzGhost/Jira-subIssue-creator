@@ -159,14 +159,17 @@
     position: absolute;
     top: 0;
     left: 0;
-    font-size: 30px;
-    color: #eee;
-    background: crimson;
+    font-size: 16px;
+    color: black;
+    background: #ccc;
     display: block;
-    height: 30px;
+    padding: 5px 10px 0 10px;
+    line-height: 20px;
 }
+.lwl-goner:active,
+.lwl-goner:focus,
 .lwl-goner:hover {
-    color: #eee;
+    color: black;
     text-decoration: none;
 }
 .lwl-hook {

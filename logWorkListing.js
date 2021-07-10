@@ -149,6 +149,7 @@
         };
     };
     function listAll(ids) {
+        msgs.push("__[o0] # story found: " + ids.length);
         var i = 0;
         var idps = [];
         for (var i = 0; i < ids.length; i++) {
@@ -166,17 +167,19 @@
         }
         Promise.all(idps).then(renderLogs, function(err){ console.log("__[xx] crashed: ", err); });
     };
-    function list(el) {
+    function prepareGround() {
+        if (ground) document.body.removeChild(ground);
         ground = document.createElement("div");
         ground.className = "lwl-ground";
         ground.innerHTML = "<span class='lwl-gears'></span>";
         document.body.appendChild(ground);
         logs = [];
         msgs = [];
-
+    }
+    function list(el) {
+        prepareGround();
         var frame = el.parentNode.parentNode.parentNode;
         var idHolders = frame.querySelectorAll("a[href^='/jira/browse']");
-        msgs.push("__[o0] # story found: " + idHolders.length);
         var ids = [];
         for (var i = 0; i < idHolders.length; i++) {
             ids.push( idHolders[i].getAttribute("title") );
@@ -292,7 +295,7 @@
             ev.preventDefault();
             opening = false;
             u.className = "";
-            console.log("__[o0] go with", ps);
+            fetchPickedSprint();
         });
         var d = document.createElement("a");
         d.href = "/dismiss";
@@ -313,4 +316,39 @@
         h.appendChild(u);
         document.body.appendChild(h);
     };
+    function fetchPickedSprint() {
+        prepareGround();
+        console.log("__[o0] ps: ", ps);
+        var url = "https://jira.axonivy.com/jira/rest/agile/1.0/sprint/"+ps.id+"/issue?fields=issuetype";
+        var total = 0;
+        var count = 0;
+        var ids = [];
+        fetch(url)
+        .then(toJson)
+        .then(function(rs){
+            total = rs.total;
+            count += rs.issues.length;
+            function collect(items) {
+                for (var i = 0; i < items.length; i++) {
+                    if ( ! items[i].fields.issuetype.subtask) {
+                        ids.push(items[i].key);
+                    }
+                }
+            }
+            collect(rs.issues);
+            var times = Math.floor(rs.total / rs.maxResults);
+            if (times * rs.maxResults != rs.total) times++;
+            var fps = [];
+            for (var i = 1; i < times; i++) {
+                fps[i] = fetch(url + "&startAt=" + (i*rs.maxResults))
+                .then(toJson)
+                .then(function(x){
+                    count += x.issues.length;
+                    console.log("__[o0] count: ", count, total);
+                    collect(x.issues);
+                });
+            }
+            Promise.all(fps).then(function(){ listAll(ids); });
+        });
+    }
 })();

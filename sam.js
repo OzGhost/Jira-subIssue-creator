@@ -1,100 +1,73 @@
 
-var Configurator = function(iCollection, submitCallback) {
-    let _self = this;
-    _self.iCollection = iCollection || [];
-    _self.shelf = undefined;
-    _self.cage = undefined;
-    _self.submitCallback = submitCallback;
-    _self.frame = ''
-        +'<div class="configurator">'
-            +'<div class="front">'
-                +'<div class="list">'
-                    +'<p>Subtask name(s)</p>'
-                    +'<ol id="stn">'
-                    +'</ol>'
-                +'</div>'
-                +'<div class="ctrl">'
-                    +'<p>Your input, sir</p>'
-                    +'<form id="input-form"><input type="text" placeholder="Subtask\'s name..." /></form>'
-                    +'<button id="submit" class="primitive">Save</button>'
-                    +'<button id="cancel">Cancel</button>'
-                +'</div>'
-            +'</div>'
-        +'</div>';
+window.onload = function(){
+    var items = [];
+    var autoid = 0;
+    var pis = document.createElement("div");
+    pis.className = "pis";
+    document.getElementById("fr").appendChild(pis);
+    
+    var shadow = document.createElement("span");
+    shadow.className = "shadow";
+    pis.appendChild(shadow);
+    var inp = document.createElement("input");
+    inp.type = "text";
+    pis.appendChild(inp);
+    inp.focus();
 
-    _self.install = function() {
-        _self.cage = document.createElement("div");
-        _self.cage.innerHTML = _self.frame;
-        document.body.appendChild(_self.cage);
-
-        _self.shelf = _self.cage.querySelector("#stn");
-        if ( ! _self.shelf) return;
-        let len = _self.iCollection.length;
-        for (let i = 0; i < len; ++i) {
-            _self.putToShelf(_self.iCollection[i]);
+    function resize() {
+        shadow.innerText = (inp.value + "").replaceAll(/\s/g, '_');
+        var w = shadow.offsetWidth + "px";
+        inp.style = "width:" + w;
+    };
+    inp.addEventListener("input", resize);
+    pis.addEventListener("click", function(ev){
+        inp.focus();
+    });
+    function removeBrick(id) {
+        var ol = items;
+        items = [];
+        for (var i = 0; i < ol.length; i++) {
+            if (ol[i].id == id) continue;
+            items.push(ol[i]);
         }
-
-        let fr = _self.cage.querySelector("form#input-form");
-        if ( ! fr) return;
-        let ip = fr.querySelector("input");
-        if ( ! ip) return;
-        fr.addEventListener("submit", function(e){
-            e.preventDefault();
-            let val = ip.value;
-            _self.add( val );
-            ip.value = "";
+    }
+    function newBrick(text) {
+        var t = document.createElement("span");
+        t.className = "brick";
+        t.appendChild(document.createTextNode(text));
+        var x = document.createElement("a");
+        t.appendChild(x);
+        x.innerHTML = "&times;";
+        x.href = "/delete";
+        var i = {
+            id: autoid++,
+            text: text
+        };
+        x.addEventListener("click", function(ev){
+            ev.preventDefault();
+            pis.removeChild(t);
+            removeBrick(i.id);
         });
-
-        let submitTrigger = _self.cage.querySelector("#submit");
-        if ( ! submitTrigger) return;
-        submitTrigger.addEventListener("click", function(){
-            _self.submitCallback && _self.submitCallback(_self.iCollection);
-        });
-
-        let cancelTrigger = _self.cage.querySelector("#cancel");
-        if ( ! cancelTrigger) return;
-        cancelTrigger.addEventListener("click", function(){
-            document.body.removeChild(_self.cage);
-        });
+        inp.before(t);
+        items.push(i);
+        return t;
     };
-
-    _self.putToShelf = function(val) {
-        let li = document.createElement("li");
-        li.innerHTML = val + " <span>&times;</span>"
-        li.className = "isubtask";
-        _self.shelf.appendChild(li);
-
-        let trigger = li.querySelector("span");
-        if ( ! trigger) return;
-        trigger.addEventListener("click", function(e) {
-            _self.remove( val, e.target );
-        });
-    };
-
-    _self.remove = function(val, el) {
-        let cc = _self.iCollection;
-        _self.iCollection = [];
-        let len = cc.length;
-        for (let i = 0; i < len; ++i) {
-            if (cc[i].toUpperCase() !== val.toUpperCase()) {
-                _self.iCollection.push(cc[i]);
-            }
+    inp.addEventListener("keydown", function(ev){
+        if (ev.key == "Enter") {
+            newBrick(inp.value);
+            inp.value = "";
+            resize();
+        } else
+        if (ev.key == "Backspace" && !inp.value) {
+            if (!items.length) return;
+            var i = items.pop();
+            pis.removeChild(inp.previousSibling);
+            inp.value = i.text;
+            resize();
+            ev.preventDefault();
         }
-        _self.shelf.removeChild(el.parentNode);
-    };
-
-    _self.add = function(val) {
-        let valTrim = val.trim();
-        let len = _self.iCollection.length;
-        for (let i = 0; i < len; ++i) {
-            if (valTrim.toUpperCase() === _self.iCollection[i].toUpperCase())
-                return;
-        }
-        _self.iCollection.push(valTrim);
-        _self.putToShelf(val);
-    };
+    });
+    newBrick("Scarlet");
+    newBrick("King");
 };
-
-var cfg = new Configurator(["Sonar", "Crosscheck"], function(col) { console.log(col) });
-//cfg.install();
 

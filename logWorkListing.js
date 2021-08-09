@@ -26,7 +26,7 @@
     };
     function toLog(sid) {
         return function(sub) {
-            var desc = sub.fields.description;
+            var desc = sub.fields.description || '';
             var comment = sub.fields.summary;
             var barrierIdx = desc.toUpperCase().indexOf("PARTICIPANT");
             var timep = "";
@@ -270,7 +270,7 @@
                 var ci = ss[j];
                 var li = document.createElement("li");
                 li.innerText = ci.name;
-                if (ci.id == as.id) {
+                if (as && ci.id == as.id) {
                     li.className = "light";
                     ali = li;
                 }

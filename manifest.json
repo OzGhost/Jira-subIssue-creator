@@ -7,12 +7,14 @@
         {
             "matches": ["https://jira.axonivy.com/*"],
             "css": [
+                "iip.css",
                 "jsc.css",
                 "batchStyle.css",
                 "logWorkListing.css",
                 "jdok.css"
             ],
             "js": [
+                "iip.js",
                 "jsc.js",
                 "vue.js",
                 "batchCreator.js",

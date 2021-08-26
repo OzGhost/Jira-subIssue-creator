@@ -1,5 +1,6 @@
 (function(){
     "use strict";
+    var did = "[Vision] Duc";
     var uid = "nhduc";
     var ground = undefined;
     var logs = undefined;
@@ -24,49 +25,42 @@
                 return 3600 * d;
         }
     };
-    function toLog(sid) {
-        return function(sub) {
-            var desc = sub.fields.description || '';
-            var comment = sub.fields.summary;
-            var barrierIdx = desc.toUpperCase().indexOf("PARTICIPANT");
-            var timep = "";
-            if (barrierIdx >= 0) {
-                if (desc.indexOf("[~" + uid + "]") == -1) {
-                    msgs.push("__[o0] Absent during: " + sid + " | " + comment);
-                    return;
-                }
-            }
-            var matched = desc.match(/(\d{4}-\d\d-\d\d):\s*(\d+(?:\.\d+)?[mh]?)/);
-            if ( ! matched) {
-                msgs.push("__[o0] no time found: " + sid + " | " + comment);
+    function toLog(sub) {
+        var sid = sub.key;
+        var desc = sub.fields.description || '';
+        var comment = sub.fields.summary;
+        var barrierIdx = desc.toUpperCase().indexOf("PARTICIPANT");
+        var timep = "";
+        if (barrierIdx >= 0) {
+            if (desc.indexOf(uid) == -1) {
+                msgs.push("__[o0] Absent during: " + sid + " | " + comment);
+                console.log("__[o0] Absent sub: ", sub);
                 return;
             }
-            logs.push({
-                time: matched[1],
-                duration: toSeconds(matched[2]),
-                last: matched[2],
-                comment: comment,
-                sid: sid
-            });
-        };
+        }
+        var matched = desc.match(/(\d{4}-\d\d-\d\d):\s*(\d+(?:\.\d+)?[mh]?)/);
+        if ( ! matched) {
+            msgs.push("__[o0] no time found: " + sid + " | " + comment);
+            return;
+        }
+        logs.push({
+            time: matched[1],
+            duration: toSeconds(matched[2]),
+            last: matched[2],
+            comment: comment,
+            sid: sid
+        });
     };
     function toJson(rs) { return rs.json() };
-    function picks(sid) {
-        return function(subs) {
-            var subps = [];
-            for (var i = 0; i < subs.length; i++) {
-                var sub = subs[i];
-                var comment = (sub.fields.summary + "").trim();
-                if ( ! comment.startsWith("[Meeting]") && ! comment.startsWith("[Code review]")) continue;
-                var stat = sub.fields.status.name;
-                if (stat != "Resolved") continue;
-                var ps = fetch(sub.self + "?fields=description,summary")
-                        .then(toJson)
-                        .then(toLog(sid));
-                subps.push(ps);
-            }
-            return Promise.all(subps);
-        };
+    function picks(subs) {
+        for (var i = 0; i < subs.length; i++) {
+            var sub = subs[i];
+            var comment = (sub.fields.summary + "").trim();
+            if ( ! comment.startsWith("[Meeting]") && ! comment.startsWith("[Code review]")) continue;
+            var stat = sub.fields.status.name;
+            if (stat != "Resolved") continue;
+            toLog(sub);
+        }
     };
     function formatDuration(d) {
         return ( + (d / 3600).toFixed(3)) + 'h';
@@ -135,7 +129,7 @@
             var records = rs.worklogs;
             for (var i = 0; i < records.length; i++) {
                 var r = records[i];
-                if (r.author.key != uid) {
+                if (r.author.displayName != did) {
                     continue;
                 }
                 logs.push({
@@ -155,14 +149,14 @@
         for (var i = 0; i < ids.length; i++) {
             (function(){
                 var id = ids[i];
-                var worklogUrl = "https://jira.axonivy.com/jira/rest/api/2/issue/"+id+"/worklog";
-                var subsUrl = "https://jira.axonivy.com/jira/rest/api/2/issue/"+id+"/subtask"; 
+                var worklogUrl = "https://axonivy.atlassian.net/rest/api/2/issue/"+id+"/worklog";
+                //var subsUrl = "https://axonivy.atlassian.net/rest/api/2/issue/"+id+"/subtask"; 
                 idps[i] = fetch(worklogUrl)
                             .then(toJson)
-                            .then(prune(id))
-                            .then(function(){ return fetch(subsUrl); })
-                            .then(toJson)
-                            .then(picks(id));
+                            .then(prune(id));
+                            //.then(function(){ return fetch(subsUrl); })
+                            //.then(toJson)
+                            //.then(picks(id));
             })();
         }
         Promise.all(idps).then(renderLogs, function(err){ console.log("__[xx] crashed: ", err); });
@@ -224,7 +218,7 @@
             }
             ss = [];
             function next(rs) {
-                var url = "https://jira.axonivy.com/jira/rest/agile/1.0/board/85/sprint?startAt=";
+                var url = "https://axonivy.atlassian.net/rest/agile/1.0/board/16/sprint?startAt=";
                 if (rs) {
                     console.log("__[o0] next ...");
                     url += (rs.maxResults + rs.startAt);
@@ -321,10 +315,11 @@
         console.log("__[o0] ps: ", ps);
         if ( ! ps) return;
         prepareGround();
-        var url = "https://jira.axonivy.com/jira/rest/agile/1.0/sprint/"+ps.id+"/issue?fields=issuetype";
+        var url = "https://axonivy.atlassian.net/rest/agile/1.0/sprint/"+ps.id+"/issue?fields=issuetype,description,summary,status";
         var total = 0;
         var count = 0;
         var ids = [];
+        var subs = [];
         fetch(url)
         .then(toJson)
         .then(function(rs){
@@ -332,7 +327,11 @@
             count += rs.issues.length;
             function collect(items) {
                 for (var i = 0; i < items.length; i++) {
-                    if ( ! items[i].fields.issuetype.subtask) {
+                    if (items[i].fields.issuetype.subtask) {
+                        if (items[i].fields.description) {
+                            subs.push(items[i]);
+                        }
+                    } else {
                         ids.push(items[i].key);
                     }
                 }
@@ -350,7 +349,10 @@
                     collect(x.issues);
                 });
             }
-            Promise.all(fps).then(function(){ listAll(ids); });
+            Promise.all(fps).then(function(){
+                listAll(ids);
+                picks(subs);
+            });
         });
     }
 })();

@@ -88,7 +88,7 @@
     padding: 8px 16px;
     color: #ddd;
     overflow-y: auto;
-    font-family: 'Anonymous Pro', monospace;
+    font-family: 'Anonymous Pro', monospace !important;
     box-shadow: 0 0 12px #eee;
 }
 .lwl-frame h1 {

@@ -5,7 +5,7 @@
     "permissions": ["activeTab", "storage", "webNavigation"],
     "content_scripts": [
         {
-            "matches": ["https://jira.axonivy.com/*"],
+            "matches": ["https://axonivy.atlassian.net/*"],
             "css": [
                 "iip.css",
                 "jsc.css",

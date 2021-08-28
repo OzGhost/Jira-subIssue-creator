@@ -1,7 +1,7 @@
 (function(){
     "use strict";
-    var did = "[Vision] Duc";
-    var uid = "nhduc";
+    var did = undefined;
+    var uid = undefined;
     var ground = undefined;
     var logs = undefined;
     var msgs = undefined;
@@ -63,7 +63,7 @@
         }
     };
     function formatDuration(d) {
-        return ( + (d / 3600).toFixed(3)) + 'h';
+        return Math.round((d / 3600)) + 'h' + Math.round((d%3600)/60) + 'm';
     };
     function toCid(timestring) {
         return timestring.substring(0, 10);
@@ -199,7 +199,21 @@
             sprint.appendChild(clever);
         }
     };
+
     window.lwl = function() {
+        if (typeof window.gcfpull != 'function') {
+            return { msg: "Cfg module is mising!" };
+        }
+        window.gcfpull()
+            .then(function(cfg){
+                var lwl = cfg.lwl || {};
+                did = lwl.displayName;
+                uid = lwl.shortName;
+                init();
+            });
+    };
+
+    function init() {
         var qry = window.location.search;
         var args = {};
         if (qry.length) {

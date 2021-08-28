@@ -109,6 +109,7 @@
         _self.taskNames = [];
 
         _self.watch = function() {
+            if (true) return;
             document.addEventListener("keydown", function(event){
                 if (event.shiftKey && event.ctrlKey) {
                     if (event.code === "KeyF") {

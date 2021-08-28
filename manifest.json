@@ -11,7 +11,8 @@
                 "jsc.css",
                 "batchStyle.css",
                 "logWorkListing.css",
-                "jdok.css"
+                "jdok.css",
+                "cfg.css"
             ],
             "js": [
                 "iip.js",
@@ -20,7 +21,8 @@
                 "batchCreator.js",
                 "logWorkListing.js",
                 "jdok.js",
-                "icstore.js"
+                "icstore.js",
+                "cfg.js"
             ],
             "run_at": "document_end"
         }

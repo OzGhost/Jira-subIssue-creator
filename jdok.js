@@ -12,15 +12,10 @@
             return;
         }
         console.log("__[o0] encounter:", ev.key);
-        return;
         switch (ev.key) {
             case "Escape":
                 console.log("__[o0] dedocking ...");
                 return umount();
-            case "w":
-                return omodule("lwl")();
-            case "b":
-                return omodule("bulkc")();
         }
     });
     function omodule(name) {
@@ -48,9 +43,9 @@
         bar = document.createElement("div");
         bar.className = "jbar";
         bar.appendChild( createAnchor("(B)ulk", "poison_v2", omodule("bulkc")) );
-        bar.appendChild( createAnchor("Cre(a)tor", "water-pollution") );
+        //bar.appendChild( createAnchor("Cre(a)tor", "water-pollution") );
         bar.appendChild( createAnchor("L(w)l", "smoking", omodule("lwl")) );
-        bar.appendChild( createAnchor("(C)fg", "dangerous") );
+        bar.appendChild( createAnchor("(C)fg", "dangerous", omodule("gcf")) );
         dok = document.createElement("div");
         dok.className = "jdok";
         dok.appendChild(bar);
@@ -79,3 +74,4 @@
         }
     };
 })();
+

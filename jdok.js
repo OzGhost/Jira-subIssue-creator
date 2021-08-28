@@ -1,6 +1,8 @@
 (function(){
     var dok = undefined;
-    var bar = undefined
+    var bar = undefined;
+    var tray = undefined;
+    var traytime = undefined;
     document.body.addEventListener('keydown', function(ev){
         if (ev.ctrlKey && ev.shiftKey && ev.key == "L") {
             mount();
@@ -10,15 +12,33 @@
             return;
         }
         console.log("__[o0] encounter:", ev.key);
+        return;
         switch (ev.key) {
             case "Escape":
                 console.log("__[o0] dedocking ...");
                 return umount();
             case "w":
-                console.log("__[o0] open lwl ...");
-                return window.lwl && window.lwl();
+                return omodule("lwl")();
+            case "b":
+                return omodule("bulkc")();
         }
     });
+    function omodule(name) {
+        return function(){
+            console.log("__[o0] open " + name + " ...");
+            var rs = (typeof window[name] == 'function') && window[name]();
+            if (rs && rs.msg) {
+                pushMsg(rs.msg);
+            }
+        };
+    };
+    function pushMsg(msg) {
+        var t = document.createElement("p");
+        t.innerHTML = msg;
+        tray.appendChild(t);
+        clearTimeout(traytime);
+        traytime = setTimeout(function(){ tray.innerHTML = "" }, 3000);
+    };
     function mount() {
         if (dok) {
             console.log("__[o0] docked !!!");
@@ -27,13 +47,16 @@
         console.log("__[o0] docking ...");
         bar = document.createElement("div");
         bar.className = "jbar";
-        bar.appendChild( createAnchor("(B)ulk", "poison_v2") );
+        bar.appendChild( createAnchor("(B)ulk", "poison_v2", omodule("bulkc")) );
         bar.appendChild( createAnchor("Cre(a)tor", "water-pollution") );
-        bar.appendChild( createAnchor("L(w)l", "smoking", function(){ window.lwl && window.lwl(); }) );
+        bar.appendChild( createAnchor("L(w)l", "smoking", omodule("lwl")) );
         bar.appendChild( createAnchor("(C)fg", "dangerous") );
         dok = document.createElement("div");
         dok.className = "jdok";
         dok.appendChild(bar);
+        tray = document.createElement("div");
+        tray.className = "jtray";
+        dok.appendChild(tray);
         document.body.appendChild(dok);
     };
     function createAnchor(title, icon, func) {

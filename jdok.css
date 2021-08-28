@@ -42,6 +42,7 @@
     display: inline-block;
     opacity: 0.7;
     transition: all ease 0.2s;
+    box-shadow: none !important;
 }
 .jdok .jbar a:hover {
     width: 80px;
@@ -56,4 +57,15 @@
     position: absolute;
     bottom: 0;
     transition: all ease 0.2s;
+}
+.jdok .jtray {
+    position: absolute;
+    z-index: 101;
+    bottom: 75px;
+    left: 10px;
+}
+.jdok .jtray p {
+    margin: 0 0 10px 0;
+    background: lightgrey;
+    padding: 10px 16px;
 }

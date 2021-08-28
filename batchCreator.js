@@ -1,6 +1,24 @@
 'use strict';
-(function(){
-    if ( ! /jira\/browse\/[A-Z]+-[0-9]+/.test(window.location.href)) return;
+window.bulkc = function(){
+    if ( ! /\/browse\/[A-Z]+-[0-9]+/.test(window.location.href)) return { msg: "Only work on story browsing page ..." };
+    if (document.getElementById("bc-frame")) {
+        return { msg: "Bulk mounted ..." };
+    }
+    var prj = "";
+    var issue = "";
+    function trigger(){
+        var prjAnchor = document.getElementById("jira-issue-header").querySelectorAll("a")[1];
+        if (prjAnchor && prjAnchor.href) {
+            var href = prjAnchor.href;
+            prj = href.substring(href.lastIndexOf('/')+1);
+        }
+        var path = window.location.pathname;
+        issue = path.substring(path.lastIndexOf('/')+1);
+    };
+    trigger();
+    if ( !prj || !issue ) {
+        return { msg: "Either project name or issue name cannot be found!" };
+    }
     var idGen = (function(){
         var cid = 0;
         return function(){
@@ -9,19 +27,19 @@
     })();
     var tag = document.createElement('DIV');
     document.body.appendChild(tag);
+    function umount(){ document.body.removeChild(tag) };
     tag.id = 'bc-frame';
     tag.innerHTML = ''
         +'<div id="batch-creator">'
-        +'  <button class="bc-hollow" @click="trigger"><span class="bc-icon"></span></button>'
-        +'  <transition name="error">'
-        +'      <p class="bc-error-shell" v-if="error">'
-        +'          <span class="bc-error-panel">Found projectKey=[{{ prj }}] and issueKey=[{{ issue }}]. Maybe something went wrong with one of them!</span>'
-        +'      </p>'
-        +'  </transition>'
-        +'  <div class="bc-ground" v-if="extended"></div>'
-        +'  <div class="bc-screen" v-if="extended">'
+        +'  <div class="bc-screen" :class="{ghost: ghostMode}">'
+        +'      <div class="i-head">'
+        +'          <p>'
+        +'              Ready sub(s)'
+        +'              <button class="kmi" :class="{on: killMode}" @click="onModeSwitch">KILL MODE</button>'
+        +'              <button @click="ghostMode = !ghostMode">(@ @)</button>'
+        +'          </p>'
+        +'      </div>'
         +'      <div class="i-tray">'
-        +'          <p class="i-tray-title">Ready sub(s) <button class="kmi" :class="{on: killMode}" @click="onModeSwitch">KILL MODE</button></p>'
         +'          <p class="i-empty" v-if="!killMode && subs.length == 0">You are out of sub!</p>'
         +'          <p class="i-empty" v-if="killMode && vics.length == 0">No vic to go!</p>'
         +'          <transition-group name="bar" tag="div" v-if="!killMode">'
@@ -47,7 +65,7 @@
         +'      </div>'
         +'      <div class="i-ctl" v-if="!killMode">'
         +'          <input class="m-input" type="text" placeholder="Task\'s name" @keydown="keystroke"/>'
-        +'          <button class="bc-btn m-close" @click="extended = false">Close</button>'
+        +'          <button class="bc-btn m-close" @click="release">Close</button>'
         +'          <button class="bc-btn m-dismiss" @click="dismiss">Dismiss</button>'
         +'          <button class="bc-btn m-submit" @click="submit">Submit</button>'
         +'      </div>'
@@ -55,49 +73,16 @@
         +'</div>'
     ;
     
-    new Vue({
-        el: '#batch-creator',
+    var cfg = {
+        el: tag.childNodes[0],
         data: {
-            extended: false,
             error: false,
             subs: [],
             vics: [],
-            prj: "",
-            issue: "",
-            killMode: false
+            killMode: false,
+            ghostMode: false
         },
         methods: {
-            trigger: function(){
-                this.prj = "";
-                this.issue = "";
-                if (this.extended) {
-                    this.extended = false;
-                } else {
-                    var prjAnchor = document.getElementById('project-name-val');
-                    var href = "";
-                    if (prjAnchor && prjAnchor.nodeName == 'A' && prjAnchor.href) {
-                        href = prjAnchor.href;
-                        this.prj = href.substring(href.lastIndexOf('/')+1);
-                    }
-                    var issueAnchor = document.getElementById('key-val');
-                    if (issueAnchor && issueAnchor.nodeName == 'A' && issueAnchor.href) {
-                        href = issueAnchor.href;
-                        this.issue = href.substring(href.lastIndexOf('/')+1);
-                    }
-                    if (this.prj && this.issue) {
-                        this.extended = true;
-                        this.error = false;
-                    } else {
-                        if (!this.error) {
-                            this.error = true;
-                            var ctx = this;
-                            setTimeout(function(){
-                                ctx.error = false;
-                            }, 3000);
-                        }
-                    }
-                }
-            },
             keystroke: function(e){
                 if (e.code == 'Enter') {
                     this.subs.push({
@@ -111,6 +96,9 @@
             dismiss: function() {
                 this.subs = [];
             },
+            release: function() {
+                umount();
+            },
             submit: function() {
                 var len = this.subs.length;
                 var ctx = this;
@@ -122,7 +110,7 @@
                     (function(){
                         var sub = isub;
                         sub.stat = 'await';
-                        fetch("https://jira.axonivy.com/jira/rest/api/2/issue/", {
+                        fetch("https://axonivy.atlassian.net/rest/api/2/issue/", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: ctx._createPayload(sub.name)
@@ -143,8 +131,8 @@
             },
             _createPayload: function(subName) {
                 return '{"fields":{"project":{"key": "'
-                    +this.prj+'"},"parent":{"key": "'
-                    +this.issue+'"},"summary":"'+subName+'","issuetype":{"id":"8"},"customfield_11200":{"id":"10504"}}}';
+                    +prj+'"},"parent":{"key": "'
+                    +issue+'"},"summary":"'+subName+'","issuetype":{"id":"10029"},"customfield_10049":{"id":"10071"}}}';
             },
             remove: function(index) {
                 this.subs.splice(index, 1);
@@ -154,7 +142,7 @@
                 if (this.killMode) {
                     this.vics = [];
                     var ctx = this;
-                    fetch("https://jira.axonivy.com/jira/rest/api/2/issue/"+this.issue+"?fields=subtasks")
+                    fetch("https://axonivy.atlassian.net/rest/api/2/issue/"+issue+"?fields=subtasks")
                         .then(function(rs) {
                             if (rs.ok) {
                                 return rs.json();
@@ -182,7 +170,7 @@
                 }
                 vic.stat = 'await';
                 var ctx = this;
-                fetch("https://jira.axonivy.com/jira/rest/api/2/issue/"+vic.id, { method: "DELETE" })
+                fetch("https://axonivy.atlassian.net/rest/api/2/issue/"+vic.id, { method: "DELETE" })
                     .then(function(rs){
                         if (rs.ok) {
                             ctx.vics = ctx.vics.filter(function(v){
@@ -198,6 +186,7 @@
                     });
             }
         }
-    });
-})();
+    };
+    new Vue(cfg);
+};
 

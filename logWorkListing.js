@@ -63,7 +63,7 @@
         }
     };
     function formatDuration(d) {
-        return Math.round((d / 3600)) + 'h' + Math.round((d%3600)/60) + 'm';
+        return Math.floor((d / 3600)) + 'h' + Math.floor((d%3600)/60) + 'm';
     };
     function toCid(timestring) {
         return timestring.substring(0, 10);

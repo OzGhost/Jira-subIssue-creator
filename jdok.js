@@ -45,6 +45,7 @@
         bar.appendChild( createAnchor("(B)ulk", "poison_v2", omodule("bulkc")) );
         //bar.appendChild( createAnchor("Cre(a)tor", "water-pollution") );
         bar.appendChild( createAnchor("L(w)l", "smoking", omodule("lwl")) );
+        bar.appendChild( createAnchor("(M)ask", "mask", omodule("mask")) );
         bar.appendChild( createAnchor("(C)fg", "dangerous", omodule("gcf")) );
         dok = document.createElement("div");
         dok.className = "jdok";

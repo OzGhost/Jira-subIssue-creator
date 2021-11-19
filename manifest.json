@@ -22,7 +22,8 @@
                 "logWorkListing.js",
                 "jdok.js",
                 "icstore.js",
-                "cfg.js"
+                "cfg.js",
+                "mask.js"
             ],
             "run_at": "document_end"
         }

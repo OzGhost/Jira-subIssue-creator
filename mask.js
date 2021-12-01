@@ -16,7 +16,7 @@
             el.setAttribute('style', null);
         } else {
             el.style.position = 'fixed';
-            el.style['z-index'] = '5000';
+            el.style['z-index'] = '2900';
             el.style.top = '0';
             el.style.bottom = '0';
             el.style.left = '0';
